@@ -30,7 +30,7 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-20 sm:h-24">
           <div className="flex items-center">
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Mon Protocole</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">E-Protocol</h1>
               <p className="text-sm sm:text-base text-gray-600">Bonjour {user?.name || user?.email?.split('@')[0] || 'Utilisateur'} 👋</p>
             </div>
           </div>
