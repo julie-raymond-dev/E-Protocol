@@ -1,5 +1,5 @@
 import { useAuth0 } from '@auth0/auth0-react';
-import { LogOut, User, Menu, X, Calendar } from 'lucide-react';
+import { LogOut, User, Calendar, ChefHat } from 'lucide-react';
 import { useState } from 'react';
 
 export default function Navbar() {
@@ -17,6 +17,12 @@ export default function Navbar() {
   const goToToday = () => {
     // Déclencher un événement personnalisé pour retourner à aujourd'hui
     window.dispatchEvent(new CustomEvent('goToToday'));
+    setIsMenuOpen(false);
+  };
+
+  const openRecipes = () => {
+    // Déclencher un événement personnalisé pour ouvrir les recettes
+    window.dispatchEvent(new CustomEvent('openRecipes'));
     setIsMenuOpen(false);
   };
 
@@ -85,6 +91,15 @@ export default function Navbar() {
             <User className="h-5 w-5 text-gray-600" />
             <span className="text-sm font-medium text-gray-900">{user?.name || user?.email}</span>
           </div>
+          
+          {/* Bouton Mes Recettes */}
+          <button
+            onClick={openRecipes}
+            className="w-full flex items-center gap-3 p-3 text-left hover:bg-purple-50 rounded-lg transition-colors group"
+          >
+            <ChefHat className="h-5 w-5 text-purple-600" />
+            <span className="text-sm text-gray-700 group-hover:text-purple-700">Mes Recettes</span>
+          </button>
           
           {/* Bouton Aujourd'hui */}
           <button
