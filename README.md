@@ -4,22 +4,45 @@ A comprehensive personal nutrition and fitness tracking application built with R
 
 ## ⚙️ Configuration
 
-### Variables d'environnement
+### Configuration Auth0
 
-Pour que l'authentification fonctionne, vous devez créer un fichier `.env` à la racine du projet :
+Cette application utilise Auth0 pour l'authentification sécurisée. Voici comment la configurer :
 
-1. Copiez le fichier `.env.example` :
-   ```bash
-   cp .env.example .env
-   ```
+#### 1. Créer un compte Auth0
 
-2. Modifiez le fichier `.env` avec vos identifiants :
-   ```env
-   VITE_AUTH_USERNAME=votre_nom_utilisateur
-   VITE_AUTH_PASSWORD=votre_mot_de_passe
-   ```
+1. Allez sur [auth0.com](https://auth0.com) et créez un compte gratuit
+2. Créez un nouveau tenant (domaine)
 
-⚠️ **Important** : Le fichier `.env` contient vos identifiants personnels et ne doit jamais être commité. Il est déjà ajouté au `.gitignore`.
+#### 2. Configurer l'application
+
+1. Dans le dashboard Auth0, allez dans **Applications** → **Create Application**
+2. Choisissez **Single Page Application** et sélectionnez **React**
+3. Dans les **Settings** de votre application :
+   - **Allowed Callback URLs** : `http://localhost:5173, https://votre-domaine.github.io`
+   - **Allowed Logout URLs** : `http://localhost:5173, https://votre-domaine.github.io`
+   - **Allowed Web Origins** : `http://localhost:5173, https://votre-domaine.github.io`
+
+#### 3. Variables d'environnement
+
+Créez un fichier `.env` à la racine du projet :
+
+```bash
+cp .env.example .env
+```
+
+Remplissez le fichier `.env` avec vos valeurs Auth0 :
+
+```env
+VITE_AUTH0_DOMAIN=votre-tenant.auth0.com
+VITE_AUTH0_CLIENT_ID=votre-client-id
+VITE_AUTH0_AUDIENCE=votre-api-audience (optionnel)
+```
+
+⚠️ **Important** : Le fichier `.env` ne doit jamais être commité. Il est déjà ajouté au `.gitignore`.
+
+#### 4. Ajouter des utilisateurs
+
+Dans Auth0, allez dans **User Management** → **Users** → **Create User** pour ajouter des utilisateurs autorisés.
 
 ## 🌟 Features
 
