@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { LogOut, ChevronLeft, ChevronRight, Trophy } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ChevronLeft, ChevronRight, Trophy } from 'lucide-react';
 import { generateDayProtocol } from '../utils/protocolGenerator';
-import { getDayProgress, saveDayProgress, updateSelectedMeals, updateSelectedActivity, logout } from '../utils/storage';
+import { getDayProgress, saveDayProgress, updateSelectedMeals, updateSelectedActivity } from '../utils/storage';
 import { DayProtocol, DayProgress } from '../types';
 import { OBJECTIVES, PLATS, COLLATIONS, COMPLEMENTS_MACROS } from '../data/protocol';
 import MacroCard from './MacroCard';
@@ -12,11 +12,7 @@ import MealSelector from './MealSelector';
 import ActivitySelector from './ActivitySelector';
 import WeeklySummary from './WeeklySummary';
 
-interface DashboardProps {
-  readonly username: string;
-}
-
-export default function Dashboard({ username }: DashboardProps) {
+export default function Dashboard() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [protocol, setProtocol] = useState<DayProtocol>();
   const [progress, setProgress] = useState<DayProgress>();
@@ -102,10 +98,6 @@ export default function Dashboard({ username }: DashboardProps) {
 
   const closeActivitySelector = () => {
     setActivitySelector(false);
-  };
-
-  const handleLogout = () => {
-    logout();
   };
 
   const navigateDate = (direction: 'prev' | 'next') => {
@@ -228,24 +220,6 @@ export default function Dashboard({ username }: DashboardProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-xl font-bold text-gray-900">Mon Protocole</h1>
-              <p className="text-sm text-gray-600">Bonjour {username} 👋</p>
-            </div>
-            <button
-              onClick={handleLogout}
-              className="p-2 text-gray-600 hover:text-red-600 transition-colors"
-            >
-              <LogOut className="h-5 w-5" />
-            </button>
-          </div>
-        </div>
-      </div>
-
       {/* Date Navigation */}
       <div className="bg-white border-b px-4 py-3">
         <div className="flex items-center justify-between">

@@ -5,7 +5,7 @@ import Navbar from './components/Navbar';
 import { Loader } from 'lucide-react';
 
 function App() {
-  const { isLoading, isAuthenticated, user } = useAuth0();
+  const { isLoading, isAuthenticated } = useAuth0();
 
   if (isLoading) {
     return (
@@ -25,7 +25,7 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <Dashboard username={user?.name || user?.email || 'Utilisateur'} />
+      <Dashboard />
     </div>
   );
 }
