@@ -5,6 +5,10 @@ import Navbar from './components/Navbar';
 import { RecipesProvider } from './contexts/RecipesContext';
 import { Loader } from 'lucide-react';
 
+/**
+ * Main application component that handles authentication and renders the appropriate UI
+ * @returns {JSX.Element} The main app component with authentication flow
+ */
 function App() {
   const { isLoading, isAuthenticated } = useAuth0();
 

@@ -13,6 +13,11 @@ interface FormIngredient extends Ingredient {
   tempId: string; // Pour la gestion locale avant sauvegarde
 }
 
+/**
+ * Form component for creating and editing recipes
+ * @param {RecipeFormProps} props - Component props containing form state and handlers
+ * @returns {JSX.Element | null} The recipe form interface or null if closed
+ */
 export default function RecipeForm({ isOpen, onClose, editingRecipe }: RecipeFormProps) {
   const { createRecipe, updateRecipe, calculateRecipeMacros, generateRecipeId } = useRecipes();
   
@@ -25,10 +30,16 @@ export default function RecipeForm({ isOpen, onClose, editingRecipe }: RecipeFor
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Générer un ID temporaire pour les ingrédients
+  /**
+   * Generates a unique temporary ID for ingredients
+   * @returns {string} A unique temporary identifier
+   */
   const generateTempId = () => `temp_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
 
-  // Fonction pour créer un ingrédient vide
+  /**
+   * Creates an empty ingredient with default values
+   * @returns {FormIngredient} A new empty ingredient object
+   */
   const createEmptyIngredient = useCallback((): FormIngredient => ({
     id: '',
     tempId: generateTempId(),
@@ -43,7 +54,9 @@ export default function RecipeForm({ isOpen, onClose, editingRecipe }: RecipeFor
     },
   }), []);
 
-  // Initialiser le formulaire
+  /**
+   * Initializes the form with existing recipe data or default values
+   */
   useEffect(() => {
     if (editingRecipe) {
       setFormData({
@@ -55,7 +68,6 @@ export default function RecipeForm({ isOpen, onClose, editingRecipe }: RecipeFor
         tempId: generateTempId(),
       })));
     } else {
-      // Nouveau formulaire
       setFormData({
         name: '',
         type: 'dejeuner',
@@ -65,10 +77,12 @@ export default function RecipeForm({ isOpen, onClose, editingRecipe }: RecipeFor
     setErrors({});
   }, [editingRecipe, isOpen, createEmptyIngredient]);
 
-  // Calculer les macros totales
   const totalMacros = calculateRecipeMacros(ingredients);
 
-  // Validation
+  /**
+   * Validates form data and ingredients
+   * @returns {boolean} True if form is valid, false otherwise
+   */
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
@@ -88,7 +102,6 @@ export default function RecipeForm({ isOpen, onClose, editingRecipe }: RecipeFor
       newErrors.ingredients = 'Au moins un ingrédient valide est requis';
     }
 
-    // Vérifier que chaque ingrédient a des macros valides
     const hasValidMacros = validIngredients.some(ing => 
       ing.macros.kcal > 0 || ing.macros.P > 0 || ing.macros.L > 0 || ing.macros.G > 0
     );
@@ -101,7 +114,10 @@ export default function RecipeForm({ isOpen, onClose, editingRecipe }: RecipeFor
     return Object.keys(newErrors).length === 0;
   };
 
-  // Soumission du formulaire
+  /**
+   * Handles form submission for creating or updating a recipe
+   * @param {React.FormEvent} e - Form submission event
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -144,7 +160,11 @@ export default function RecipeForm({ isOpen, onClose, editingRecipe }: RecipeFor
     }
   };
 
-  // Gestion des ingrédients
+  /**
+   * Updates an ingredient with new data
+   * @param {string} tempId - Temporary ID of the ingredient to update
+   * @param {Partial<FormIngredient>} updates - Partial ingredient data to update
+   */
   const updateIngredient = (tempId: string, updates: Partial<FormIngredient>) => {
     setIngredients(prev => 
       prev.map(ing => 
@@ -153,10 +173,17 @@ export default function RecipeForm({ isOpen, onClose, editingRecipe }: RecipeFor
     );
   };
 
+  /**
+   * Adds a new empty ingredient to the form
+   */
   const addIngredient = () => {
     setIngredients(prev => [...prev, createEmptyIngredient()]);
   };
 
+  /**
+   * Removes an ingredient from the form
+   * @param {string} tempId - Temporary ID of the ingredient to remove
+   */
   const removeIngredient = (tempId: string) => {
     setIngredients(prev => prev.filter(ing => ing.tempId !== tempId));
   };
@@ -245,7 +272,7 @@ export default function RecipeForm({ isOpen, onClose, editingRecipe }: RecipeFor
                   <IngredientForm
                     key={ingredient.tempId}
                     ingredient={ingredient}
-                    onUpdate={(updates) => updateIngredient(ingredient.tempId, updates)}
+                    onUpdate={(updates: Partial<FormIngredient>) => updateIngredient(ingredient.tempId, updates)}
                     onRemove={() => removeIngredient(ingredient.tempId)}
                     canRemove={ingredients.length > 1}
                   />
@@ -314,7 +341,9 @@ export default function RecipeForm({ isOpen, onClose, editingRecipe }: RecipeFor
   );
 }
 
-// Composant pour un ingrédient
+/**
+ * Props for the IngredientForm component
+ */
 interface IngredientFormProps {
   readonly ingredient: FormIngredient;
   readonly onUpdate: (updates: Partial<FormIngredient>) => void;
@@ -322,6 +351,15 @@ interface IngredientFormProps {
   readonly canRemove: boolean;
 }
 
+/**
+ * Form component for managing ingredient input
+ * @param {IngredientFormProps} props - Component props
+ * @param {FormIngredient} props.ingredient - The ingredient being edited
+ * @param {function} props.onUpdate - Callback to update ingredient data
+ * @param {function} props.onRemove - Callback to remove the ingredient
+ * @param {boolean} props.canRemove - Whether the ingredient can be removed
+ * @returns {JSX.Element} Ingredient form component
+ */
 function IngredientForm({ ingredient, onUpdate, onRemove, canRemove }: IngredientFormProps) {
   return (
     <div className="border border-gray-200 rounded-lg p-4 space-y-3">

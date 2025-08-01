@@ -10,6 +10,11 @@ interface RecipeManagerProps {
   readonly onClose: () => void;
 }
 
+/**
+ * Recipe Manager component for viewing, creating, editing and managing custom recipes
+ * @param {RecipeManagerProps} props - Component props containing open state and close handler
+ * @returns {JSX.Element | null} The recipe management interface or null if closed
+ */
 export default function RecipeManager({ isOpen, onClose }: RecipeManagerProps) {
   const { 
     recipes, 
@@ -27,7 +32,10 @@ export default function RecipeManager({ isOpen, onClose }: RecipeManagerProps) {
 
   if (!isOpen) return null;
 
-  // Filtrage des recettes
+  /**
+   * Filters recipes based on search query and type filter
+   * @returns {Recipe[]} Filtered array of recipes
+   */
   const getFilteredRecipes = (): Recipe[] => {
     let filtered = searchQuery ? searchRecipes(searchQuery) : recipes;
     
@@ -40,7 +48,9 @@ export default function RecipeManager({ isOpen, onClose }: RecipeManagerProps) {
 
   const filteredRecipes = getFilteredRecipes();
 
-  // Export des recettes
+  /**
+   * Handles recipe export by creating and downloading a JSON file
+   */
   const handleExport = async () => {
     try {
       const blob = await exportRecipes();
@@ -57,7 +67,10 @@ export default function RecipeManager({ isOpen, onClose }: RecipeManagerProps) {
     }
   };
 
-  // Import des recettes
+  /**
+   * Handles recipe import from a selected file
+   * @param {React.ChangeEvent<HTMLInputElement>} event - File input change event
+   */
   const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -65,7 +78,6 @@ export default function RecipeManager({ isOpen, onClose }: RecipeManagerProps) {
         console.error('Erreur import:', err);
       });
     }
-    // Reset l'input
     event.target.value = '';
   };
 

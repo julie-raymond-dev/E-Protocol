@@ -2,25 +2,20 @@ import React, { createContext, useEffect, useState, ReactNode, useMemo, useCallb
 import { recipeStorage, Recipe, Ingredient, ExportData } from '../services/recipeStorage';
 
 interface RecipesContextType {
-  // État
   recipes: Recipe[];
   isLoading: boolean;
   error: string | null;
   
-  // Actions CRUD
   createRecipe: (recipe: Omit<Recipe, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
   updateRecipe: (id: string, updates: Partial<Recipe>) => Promise<void>;
   deleteRecipe: (id: string) => Promise<void>;
   
-  // Filtres et recherche
   getRecipesByType: (type: Recipe['type']) => Recipe[];
   searchRecipes: (query: string) => Recipe[];
   
-  // Import/Export
   exportRecipes: () => Promise<Blob>;
   importRecipes: (file: File) => Promise<void>;
   
-  // Utilitaires
   generateRecipeId: () => string;
   calculateRecipeMacros: (ingredients: Ingredient[]) => { kcal: number; P: number; L: number; G: number };
 }
@@ -31,13 +26,20 @@ interface RecipesProviderProps {
   children: ReactNode;
 }
 
+/**
+ * Provider component for managing recipes state and operations
+ * @param {RecipesProviderProps} props - The provider props containing children
+ * @returns {JSX.Element} The context provider with recipe management capabilities
+ */
 export const RecipesProvider: React.FC<RecipesProviderProps> = ({ children }) => {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Initialisation
   useEffect(() => {
+    /**
+     * Initializes the IndexedDB storage and loads existing recipes
+     */
     const initializeStorage = async () => {
       try {
         setIsLoading(true);
@@ -56,12 +58,19 @@ export const RecipesProvider: React.FC<RecipesProviderProps> = ({ children }) =>
     initializeStorage();
   }, []);
 
-  // Générer un ID unique
+  /**
+   * Generates a unique ID for new recipes
+   * @returns {string} A unique recipe ID with timestamp and random string
+   */
   const generateRecipeId = useCallback((): string => {
     return `recipe_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
   }, []);
 
-  // Calculer les macros totales d'une recette
+  /**
+   * Calculates total macronutrients from a list of ingredients
+   * @param {Ingredient[]} ingredients - Array of ingredients to calculate macros for
+   * @returns {object} Object containing total kcal, P, L, G values
+   */
   const calculateRecipeMacros = useCallback((ingredients: Ingredient[]) => {
     return ingredients.reduce(
       (total, ingredient) => ({
@@ -74,7 +83,11 @@ export const RecipesProvider: React.FC<RecipesProviderProps> = ({ children }) =>
     );
   }, []);
 
-  // Créer une nouvelle recette
+  /**
+   * Creates a new recipe and saves it to storage
+   * @param {Omit<Recipe, 'id' | 'createdAt' | 'updatedAt'>} recipeData - Recipe data without auto-generated fields
+   * @throws {Error} When recipe creation fails
+   */
   const createRecipe = useCallback(async (recipeData: Omit<Recipe, 'id' | 'createdAt' | 'updatedAt'>): Promise<void> => {
     try {
       const now = new Date().toISOString();
@@ -95,7 +108,12 @@ export const RecipesProvider: React.FC<RecipesProviderProps> = ({ children }) =>
     }
   }, [generateRecipeId]);
 
-  // Mettre à jour une recette
+  /**
+   * Updates an existing recipe with new data
+   * @param {string} id - The ID of the recipe to update
+   * @param {Partial<Recipe>} updates - Partial recipe data to update
+   * @throws {Error} When recipe is not found or update fails
+   */
   const updateRecipe = useCallback(async (id: string, updates: Partial<Recipe>): Promise<void> => {
     try {
       const existingRecipe = recipes.find(r => r.id === id);
@@ -106,7 +124,7 @@ export const RecipesProvider: React.FC<RecipesProviderProps> = ({ children }) =>
       const updatedRecipe: Recipe = {
         ...existingRecipe,
         ...updates,
-        id, // S'assurer que l'ID ne change pas
+        id,
         updatedAt: new Date().toISOString(),
       };
 
@@ -120,7 +138,11 @@ export const RecipesProvider: React.FC<RecipesProviderProps> = ({ children }) =>
     }
   }, [recipes]);
 
-  // Supprimer une recette
+  /**
+   * Deletes a recipe from storage and state
+   * @param {string} id - The ID of the recipe to delete
+   * @throws {Error} When deletion fails
+   */
   const deleteRecipe = useCallback(async (id: string): Promise<void> => {
     try {
       await recipeStorage.deleteRecipe(id);
@@ -133,12 +155,20 @@ export const RecipesProvider: React.FC<RecipesProviderProps> = ({ children }) =>
     }
   }, []);
 
-  // Filtrer par type
+  /**
+   * Filters recipes by meal type
+   * @param {Recipe['type']} type - The meal type to filter by
+   * @returns {Recipe[]} Array of recipes matching the specified type
+   */
   const getRecipesByType = useCallback((type: Recipe['type']): Recipe[] => {
     return recipes.filter(recipe => recipe.type === type);
   }, [recipes]);
 
-  // Recherche par nom
+  /**
+   * Searches recipes by name or ingredient name
+   * @param {string} query - The search query string
+   * @returns {Recipe[]} Array of recipes matching the search criteria
+   */
   const searchRecipes = useCallback((query: string): Recipe[] => {
     if (!query.trim()) return recipes;
     
@@ -151,7 +181,11 @@ export const RecipesProvider: React.FC<RecipesProviderProps> = ({ children }) =>
     );
   }, [recipes]);
 
-  // Export des recettes
+  /**
+   * Exports all recipes as a JSON blob
+   * @returns {Promise<Blob>} A blob containing the exported recipe data
+   * @throws {Error} When export fails
+   */
   const exportRecipes = useCallback(async (): Promise<Blob> => {
     try {
       const exportData = await recipeStorage.exportAllData();
@@ -164,13 +198,16 @@ export const RecipesProvider: React.FC<RecipesProviderProps> = ({ children }) =>
     }
   }, []);
 
-  // Import des recettes
+  /**
+   * Imports recipes from a JSON file
+   * @param {File} file - The file containing recipe data to import
+   * @throws {Error} When file format is invalid or import fails
+   */
   const importRecipes = useCallback(async (file: File): Promise<void> => {
     try {
       const text = await file.text();
       const data: ExportData = JSON.parse(text);
       
-      // Validation basique
       if (!data.recipes || !Array.isArray(data.recipes)) {
         throw new Error('Format de fichier invalide');
       }

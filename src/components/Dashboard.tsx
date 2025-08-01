@@ -9,13 +9,20 @@ import MealCard from './MealCard';
 import SportCard from './SportCard';
 import ComplementsCard from './ComplementsCard';
 
-// Type pour les types de repas
+/**
+ * Type definition for meal types in the protocol
+ */
 type MealType = 'dejeuner' | 'diner' | 'colation';
+
 import MealSelector from './MealSelector';
 import ActivitySelector from './ActivitySelector';
 import WeeklySummary from './WeeklySummary';
 import RecipeManager from './RecipeManager';
 
+/**
+ * Main dashboard component for displaying daily nutrition protocol and progress tracking
+ * @returns {JSX.Element} Dashboard component with meal cards, activity tracking, and progress monitoring
+ */
 export default function Dashboard() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [protocol, setProtocol] = useState<DayProtocol>();
@@ -54,12 +61,18 @@ export default function Dashboard() {
     }
   }, [currentDate]);
 
-  // Écouter l'événement pour retourner à aujourd'hui
+  // Set up event listeners for navigation and recipe management
   useEffect(() => {
+    /**
+     * Handler to navigate back to today's date
+     */
     const handleGoToToday = () => {
       setCurrentDate(new Date());
     };
 
+    /**
+     * Handler to open the recipe manager
+     */
     const handleOpenRecipes = () => {
       setRecipeManagerOpen(true);
     };
@@ -73,6 +86,10 @@ export default function Dashboard() {
     };
   }, []);
 
+  /**
+   * Updates the daily progress and saves it to storage
+   * @param {Partial<DayProgress>} updates - Partial progress data to update
+   */
   const updateProgress = (updates: Partial<DayProgress>) => {
     if (!progress) return;
     
@@ -81,49 +98,75 @@ export default function Dashboard() {
     saveDayProgress(newProgress);
   };
 
+  /**
+   * Handles meal selection and regenerates the protocol
+   * @param {MealType} mealType - Type of meal being selected
+   * @param {string} mealKey - Key identifier for the selected meal
+   */
   const handleMealSelection = (mealType: MealType, mealKey: string) => {
     if (!protocol || !progress) return;
     
     const selectedMeals = { ...progress.selectedMeals, [mealType]: mealKey };
     updateSelectedMeals(protocol.date, selectedMeals);
     
-    // Régénérer le protocole avec le nouveau plat
+    // Regenerate protocol with the new meal
     const newProtocol = generateDayProtocol(currentDate, selectedMeals);
     setProtocol(newProtocol);
     
-    // Mettre à jour le progress avec les nouvelles sélections
+    // Update progress with new selections
     updateProgress({ selectedMeals });
   };
 
+  /**
+   * Handles activity selection and regenerates the protocol
+   * @param {string} activity - Selected activity identifier
+   */
   const handleActivitySelection = (activity: string) => {
     if (!protocol || !progress) return;
     
     updateSelectedActivity(protocol.date, activity);
     
-    // Régénérer le protocole avec la nouvelle activité
+    // Regenerate protocol with the new activity
     const newProtocol = generateDayProtocol(currentDate, progress.selectedMeals, activity);
     setProtocol(newProtocol);
     
-    // Mettre à jour le progress avec la nouvelle activité
+    // Update progress with the new activity
     updateProgress({ selectedActivity: activity });
   };
 
+  /**
+   * Opens the meal selector modal for a specific meal type
+   * @param {MealType} type - Type of meal to select
+   */
   const openMealSelector = (type: MealType) => {
     setMealSelector({ isOpen: true, type });
   };
 
+  /**
+   * Closes the meal selector modal
+   */
   const closeMealSelector = () => {
     setMealSelector({ isOpen: false, type: null });
   };
 
+  /**
+   * Opens the activity selector modal
+   */
   const openActivitySelector = () => {
     setActivitySelector(true);
   };
 
+  /**
+   * Closes the activity selector modal
+   */
   const closeActivitySelector = () => {
     setActivitySelector(false);
   };
 
+  /**
+   * Navigates to the previous or next day
+   * @param {'prev' | 'next'} direction - Direction to navigate
+   */
   const navigateDate = (direction: 'prev' | 'next') => {
     const newDate = new Date(currentDate);
     newDate.setDate(newDate.getDate() + (direction === 'next' ? 1 : -1));
@@ -134,6 +177,11 @@ export default function Dashboard() {
 
   if (!protocol || !progress) return null;
 
+  /**
+   * Gets the current meal key for a specific meal type
+   * @param {MealType} mealType - Type of meal to get key for
+   * @returns {string} Current meal key
+   */
   const getCurrentMealKey = (mealType: MealType): string => {
     if (mealType === 'colation') {
       return progress.selectedMeals?.colation || 'Fruit + amandes';
@@ -143,13 +191,16 @@ export default function Dashboard() {
     return Object.keys(PLATS).find(key => PLATS[key].name === mealName) || Object.keys(PLATS)[0];
   };
 
-  // Calculer les macros réelles en ne prenant en compte que les sources cochées
+  /**
+   * Calculates actual macros based on checked items only
+   * @returns {Object} Object containing kcal, P, L, G values for consumed items
+   */
   const calculateActualMacros = () => {
     if (!protocol || !progress) return { kcal: 0, P: 0, L: 0, G: 0 };
 
     const totals = { kcal: 0, P: 0, L: 0, G: 0 };
 
-    // Petit-déjeuner
+    // Breakfast
     if (progress.petitDejeuner) {
       totals.kcal += protocol.petitDejeuner.kcal;
       totals.P += protocol.petitDejeuner.P;
@@ -157,7 +208,7 @@ export default function Dashboard() {
       totals.G += protocol.petitDejeuner.G;
     }
 
-    // Déjeuner
+    // Lunch
     if (progress.dejeuner) {
       totals.kcal += protocol.dejeuner.kcal;
       totals.P += protocol.dejeuner.P;
@@ -165,7 +216,7 @@ export default function Dashboard() {
       totals.G += protocol.dejeuner.G;
     }
 
-    // Dîner
+    // Dinner
     if (progress.diner) {
       totals.kcal += protocol.diner.kcal;
       totals.P += protocol.diner.P;
@@ -189,7 +240,7 @@ export default function Dashboard() {
       totals.G += protocol.clearWhey.G;
     }
 
-    // Compléments
+    // Supplements
     progress.complements.forEach((isCompleted, index) => {
       if (isCompleted && protocol.complements[index]) {
         const complementName = protocol.complements[index];
@@ -206,10 +257,10 @@ export default function Dashboard() {
     return totals;
   };
 
-  // Vérifier si c'est dimanche pour afficher le récapitulatif
+  // Check if it's Sunday to display the summary
   const isSunday = currentDate.getDay() === 0;
 
-  // Données simulées pour le récapitulatif hebdomadaire
+  // Simulated data for weekly summary
   const getWeeklySummaryData = () => {
     const startOfWeek = new Date(currentDate);
     startOfWeek.setDate(currentDate.getDate() - currentDate.getDay() + 1);
