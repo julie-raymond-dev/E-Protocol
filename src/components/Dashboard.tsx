@@ -133,7 +133,7 @@ export default function Dashboard({ username, onLogout }: DashboardProps) {
   const calculateActualMacros = () => {
     if (!protocol || !progress) return { kcal: 0, P: 0, L: 0, G: 0 };
 
-    let totals = { kcal: 0, P: 0, L: 0, G: 0 };
+    const totals = { kcal: 0, P: 0, L: 0, G: 0 };
 
     // Petit-déjeuner
     if (progress.petitDejeuner) {
