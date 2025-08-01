@@ -8,9 +8,13 @@ import MacroCard from './MacroCard';
 import MealCard from './MealCard';
 import SportCard from './SportCard';
 import ComplementsCard from './ComplementsCard';
+
+// Type pour les types de repas
+type MealType = 'dejeuner' | 'diner' | 'colation';
 import MealSelector from './MealSelector';
 import ActivitySelector from './ActivitySelector';
 import WeeklySummary from './WeeklySummary';
+import RecipeManager from './RecipeManager';
 
 export default function Dashboard() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -18,10 +22,11 @@ export default function Dashboard() {
   const [progress, setProgress] = useState<DayProgress>();
   const [mealSelector, setMealSelector] = useState<{
     isOpen: boolean;
-    type: 'dejeuner' | 'diner' | 'colation' | null;
+    type: MealType | null;
   }>({ isOpen: false, type: null });
   const [activitySelector, setActivitySelector] = useState(false);
   const [weeklySummaryOpen, setWeeklySummaryOpen] = useState(false);
+  const [recipeManagerOpen, setRecipeManagerOpen] = useState(false);
 
   useEffect(() => {
     const existingProgress = getDayProgress(currentDate.toISOString().split('T')[0]);
@@ -55,8 +60,17 @@ export default function Dashboard() {
       setCurrentDate(new Date());
     };
 
+    const handleOpenRecipes = () => {
+      setRecipeManagerOpen(true);
+    };
+
     window.addEventListener('goToToday', handleGoToToday);
-    return () => window.removeEventListener('goToToday', handleGoToToday);
+    window.addEventListener('openRecipes', handleOpenRecipes);
+    
+    return () => {
+      window.removeEventListener('goToToday', handleGoToToday);
+      window.removeEventListener('openRecipes', handleOpenRecipes);
+    };
   }, []);
 
   const updateProgress = (updates: Partial<DayProgress>) => {
@@ -67,7 +81,7 @@ export default function Dashboard() {
     saveDayProgress(newProgress);
   };
 
-  const handleMealSelection = (mealType: 'dejeuner' | 'diner' | 'colation', mealKey: string) => {
+  const handleMealSelection = (mealType: MealType, mealKey: string) => {
     if (!protocol || !progress) return;
     
     const selectedMeals = { ...progress.selectedMeals, [mealType]: mealKey };
@@ -94,7 +108,7 @@ export default function Dashboard() {
     updateProgress({ selectedActivity: activity });
   };
 
-  const openMealSelector = (type: 'dejeuner' | 'diner' | 'colation') => {
+  const openMealSelector = (type: MealType) => {
     setMealSelector({ isOpen: true, type });
   };
 
@@ -120,7 +134,7 @@ export default function Dashboard() {
 
   if (!protocol || !progress) return null;
 
-  const getCurrentMealKey = (mealType: 'dejeuner' | 'diner' | 'colation'): string => {
+  const getCurrentMealKey = (mealType: MealType): string => {
     if (mealType === 'colation') {
       return progress.selectedMeals?.colation || 'Fruit + amandes';
     }
@@ -385,11 +399,11 @@ export default function Dashboard() {
       <MealSelector
         isOpen={mealSelector.isOpen}
         onClose={closeMealSelector}
-        title={
-          mealSelector.type === 'dejeuner' ? 'Choisir le déjeuner' :
-          mealSelector.type === 'diner' ? 'Choisir le dîner' :
-          'Choisir la collation'
-        }
+        title={(() => {
+          if (mealSelector.type === 'dejeuner') return 'Choisir le déjeuner';
+          if (mealSelector.type === 'diner') return 'Choisir le dîner';
+          return 'Choisir la collation';
+        })()}
         meals={mealSelector.type === 'colation' ? COLLATIONS : PLATS}
         selectedMeal={mealSelector.type ? getCurrentMealKey(mealSelector.type) : ''}
         onSelectMeal={(mealKey) => {
@@ -412,6 +426,11 @@ export default function Dashboard() {
         isOpen={weeklySummaryOpen}
         onClose={() => setWeeklySummaryOpen(false)}
         weeklyData={getWeeklySummaryData()}
+      />
+      {/* Recipe Manager Modal */}
+      <RecipeManager
+        isOpen={recipeManagerOpen}
+        onClose={() => setRecipeManagerOpen(false)}
       />
     </div>
   );
