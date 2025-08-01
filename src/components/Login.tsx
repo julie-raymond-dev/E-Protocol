@@ -26,7 +26,7 @@ export default function Login() {
           <div className="bg-emerald-100 rounded-full p-4 w-20 h-20 mx-auto mb-4 flex items-center justify-center">
             <User className="h-10 w-10 text-emerald-600" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Mon Protocole</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">E-Protocol</h1>
           <p className="text-gray-600">Accès sécurisé avec Auth0</p>
         </div>
 
