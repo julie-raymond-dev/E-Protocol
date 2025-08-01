@@ -2,6 +2,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import Navbar from './components/Navbar';
+import { RecipesProvider } from './contexts/RecipesContext';
 import { Loader } from 'lucide-react';
 
 function App() {
@@ -24,8 +25,10 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
-      <Dashboard />
+      <RecipesProvider>
+        <Navbar />
+        <Dashboard />
+      </RecipesProvider>
     </div>
   );
 }
