@@ -49,6 +49,16 @@ export default function Dashboard() {
     }
   }, [currentDate]);
 
+  // Écouter l'événement pour retourner à aujourd'hui
+  useEffect(() => {
+    const handleGoToToday = () => {
+      setCurrentDate(new Date());
+    };
+
+    window.addEventListener('goToToday', handleGoToToday);
+    return () => window.removeEventListener('goToToday', handleGoToToday);
+  }, []);
+
   const updateProgress = (updates: Partial<DayProgress>) => {
     if (!progress) return;
     
