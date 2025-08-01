@@ -1,42 +1,33 @@
-import React, { useState, useEffect } from 'react';
+import { useAuth0 } from '@auth0/auth0-react';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
-import { getUser } from './utils/storage';
+import Navbar from './components/Navbar';
+import { Loader } from 'lucide-react';
 
 function App() {
-  const [user, setUser] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const savedUser = getUser();
-    setUser(savedUser);
-    setIsLoading(false);
-  }, []);
-
-  const handleLogin = (username: string) => {
-    setUser(username);
-  };
-
-  const handleLogout = () => {
-    setUser(null);
-  };
+  const { isLoading, isAuthenticated, user } = useAuth0();
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
+          <Loader className="h-12 w-12 animate-spin text-emerald-600 mx-auto mb-4" />
           <p className="text-gray-600">Chargement...</p>
         </div>
       </div>
     );
   }
 
-  if (!user) {
-    return <Login onLogin={handleLogin} />;
+  if (!isAuthenticated) {
+    return <Login />;
   }
 
-  return <Dashboard username={user} onLogout={handleLogout} />;
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
+      <Dashboard username={user?.name || user?.email || 'Utilisateur'} />
+    </div>
+  );
 }
 
 export default App;
