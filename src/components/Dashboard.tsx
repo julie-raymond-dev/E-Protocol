@@ -3,7 +3,7 @@ import { LogOut, ChevronLeft, ChevronRight, Trophy } from 'lucide-react';
 import { generateDayProtocol } from '../utils/protocolGenerator';
 import { getDayProgress, saveDayProgress, updateSelectedMeals, updateSelectedActivity, logout } from '../utils/storage';
 import { DayProtocol, DayProgress } from '../types';
-import { OBJECTIVES, PLATS, COLLATIONS, ACTIVITES, COMPLEMENTS_MACROS } from '../data/protocol';
+import { OBJECTIVES, PLATS, COLLATIONS, COMPLEMENTS_MACROS } from '../data/protocol';
 import MacroCard from './MacroCard';
 import MealCard from './MealCard';
 import SportCard from './SportCard';
@@ -13,11 +13,10 @@ import ActivitySelector from './ActivitySelector';
 import WeeklySummary from './WeeklySummary';
 
 interface DashboardProps {
-  username: string;
-  onLogout: () => void;
+  readonly username: string;
 }
 
-export default function Dashboard({ username, onLogout }: DashboardProps) {
+export default function Dashboard({ username }: DashboardProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [protocol, setProtocol] = useState<DayProtocol>();
   const [progress, setProgress] = useState<DayProgress>();
@@ -107,7 +106,6 @@ export default function Dashboard({ username, onLogout }: DashboardProps) {
 
   const handleLogout = () => {
     logout();
-    onLogout();
   };
 
   const navigateDate = (direction: 'prev' | 'next') => {
@@ -421,7 +419,6 @@ export default function Dashboard({ username, onLogout }: DashboardProps) {
       <ActivitySelector
         isOpen={activitySelector}
         onClose={closeActivitySelector}
-        activities={ACTIVITES}
         selectedActivity={protocol?.sport || ''}
         onSelectActivity={handleActivitySelection}
       />
