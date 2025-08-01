@@ -1,13 +1,24 @@
-import React from 'react';
-
+/**
+ * Props for the MacroCard component
+ */
 interface MacroCardProps {
-  label: string;
-  value: number;
-  objective: number;
-  unit: string;
-  color: string;
+  readonly label: string;
+  readonly value: number;
+  readonly objective: number;
+  readonly unit: string;
+  readonly color: string;
 }
 
+/**
+ * Macro card component displaying macronutrient progress
+ * @param {MacroCardProps} props - Component props
+ * @param {string} props.label - Label for the macronutrient
+ * @param {number} props.value - Current value achieved
+ * @param {number} props.objective - Target objective value
+ * @param {string} props.unit - Unit of measurement
+ * @param {string} props.color - Color theme for the card
+ * @returns {JSX.Element} Macro card component with progress bar
+ */
 export default function MacroCard({ label, value, objective, unit, color }: MacroCardProps) {
   const percentage = Math.round((value / objective) * 100);
   const isComplete = percentage >= 100;

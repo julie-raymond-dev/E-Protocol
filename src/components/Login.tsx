@@ -1,9 +1,16 @@
 import { useAuth0 } from '@auth0/auth0-react';
 import { User, LogIn, Loader } from 'lucide-react';
 
+/**
+ * Login component providing Auth0 authentication interface
+ * @returns {JSX.Element} Login form with Auth0 integration
+ */
 export default function Login() {
   const { loginWithRedirect, isLoading, error } = useAuth0();
 
+  /**
+   * Initiates Auth0 login redirect flow
+   */
   const handleLogin = () => {
     loginWithRedirect();
   };

@@ -249,7 +249,7 @@ export default function RecipeForm({ isOpen, onClose, editingRecipe }: RecipeFor
               </div>
             </div>
 
-            {/* Ingrédients */}
+            {/* Ingredients */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-gray-900">Ingrédients</h3>
@@ -280,7 +280,7 @@ export default function RecipeForm({ isOpen, onClose, editingRecipe }: RecipeFor
               </div>
             </div>
 
-            {/* Récapitulatif macros */}
+            {/* Macros summary */}
             <div className="bg-gray-50 rounded-lg p-4">
               <div className="flex items-center gap-2 mb-3">
                 <Calculator className="h-5 w-5 text-gray-600" />
@@ -392,7 +392,7 @@ function IngredientForm({ ingredient, onUpdate, onRemove, canRemove }: Ingredien
           />
         </div>
 
-        {/* Quantité */}
+        {/* Quantity */}
         <div>
           <label htmlFor={`ingredient-quantity-${ingredient.tempId}`} className="block text-sm font-medium text-gray-700 mb-1">
             Quantité *
@@ -409,7 +409,7 @@ function IngredientForm({ ingredient, onUpdate, onRemove, canRemove }: Ingredien
           />
         </div>
 
-        {/* Unité */}
+        {/* Unit */}
         <div>
           <label htmlFor={`ingredient-unit-${ingredient.tempId}`} className="block text-sm font-medium text-gray-700 mb-1">
             Unité

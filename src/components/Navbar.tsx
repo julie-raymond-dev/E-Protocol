@@ -2,10 +2,17 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { LogOut, User, Calendar, ChefHat } from 'lucide-react';
 import { useState } from 'react';
 
+/**
+ * Navigation bar component with user authentication and menu actions
+ * @returns {JSX.Element} Navbar component with logout, navigation, and menu functionality
+ */
 export default function Navbar() {
   const { logout, user } = useAuth0();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  /**
+   * Handles user logout by calling Auth0 logout with return URL
+   */
   const handleLogout = () => {
     logout({ 
       logoutParams: { 
@@ -14,18 +21,27 @@ export default function Navbar() {
     });
   };
 
+  /**
+   * Dispatches custom event to navigate back to today's date
+   */
   const goToToday = () => {
-    // Déclencher un événement personnalisé pour retourner à aujourd'hui
+    // Dispatch custom event to return to today
     window.dispatchEvent(new CustomEvent('goToToday'));
     setIsMenuOpen(false);
   };
 
+  /**
+   * Dispatches custom event to open the recipe manager
+   */
   const openRecipes = () => {
-    // Déclencher un événement personnalisé pour ouvrir les recettes
+    // Dispatch custom event to open recipes
     window.dispatchEvent(new CustomEvent('openRecipes'));
     setIsMenuOpen(false);
   };
 
+  /**
+   * Toggles the mobile menu open/closed state
+   */
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
@@ -81,7 +97,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Menu déroulant */}
+      {/* Dropdown menu */}
       <div className={`absolute top-full left-0 right-0 bg-white border-b shadow-lg transition-all duration-300 z-50 ${
         isMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
       }`}>
@@ -110,7 +126,7 @@ export default function Navbar() {
             <span className="text-sm text-gray-700 group-hover:text-emerald-700">Retour à aujourd'hui</span>
           </button>
           
-          {/* Bouton Déconnexion */}
+          {/* Logout button */}
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 p-3 text-left hover:bg-red-50 rounded-lg transition-colors group"

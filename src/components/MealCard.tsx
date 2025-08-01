@@ -1,15 +1,27 @@
-import React from 'react';
 import { Check, ChevronDown } from 'lucide-react';
 import { Meal } from '../types';
 
+/**
+ * Props for the MealCard component
+ */
 interface MealCardProps {
-  meal: Meal;
-  completed: boolean;
-  onToggle: () => void;
-  canChange?: boolean;
-  onChangeClick?: () => void;
+  readonly meal: Meal;
+  readonly completed: boolean;
+  readonly onToggle: () => void;
+  readonly canChange?: boolean;
+  readonly onChangeClick?: () => void;
 }
 
+/**
+ * Meal card component displaying meal information with completion toggle
+ * @param {MealCardProps} props - Component props
+ * @param {Meal} props.meal - Meal data to display
+ * @param {boolean} props.completed - Whether the meal is completed
+ * @param {function} props.onToggle - Callback to toggle meal completion
+ * @param {boolean} props.canChange - Whether the meal can be changed
+ * @param {function} props.onChangeClick - Callback for changing the meal
+ * @returns {JSX.Element} Meal card component
+ */
 export default function MealCard({ meal, completed, onToggle, canChange, onChangeClick }: MealCardProps) {
   return (
     <div className={`bg-white rounded-xl p-4 border-2 transition-all duration-200 ${

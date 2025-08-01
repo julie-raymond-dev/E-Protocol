@@ -1,5 +1,8 @@
 import { Meal } from '../types';
 
+/**
+ * Daily macronutrient and calorie objectives
+ */
 export const OBJECTIVES = {
   P: 102,
   L: 49,
@@ -7,6 +10,9 @@ export const OBJECTIVES = {
   KCAL: 1770
 };
 
+/**
+ * Available meal options with their macronutrient values
+ */
 export const PLATS: Record<string, Meal> = {
   "Poulet tikka quinoa": { name: "Poulet tikka quinoa", kcal: 450, P: 42, L: 11, G: 44 },
   "Poulet sauce tomate": { name: "Poulet sauce tomate", kcal: 445, P: 40, L: 9, G: 49 },
@@ -19,23 +25,31 @@ export const PLATS: Record<string, Meal> = {
   "Poulet paprika patate douce": { name: "Poulet paprika patate douce", kcal: 455, P: 41, L: 13, G: 44 }
 };
 
+/**
+ * Array of available meal names
+ */
 export const PLAT_NAMES = Object.keys(PLATS);
 
+/**
+ * Available activity and exercise options
+ */
 export const ACTIVITES = [
-  // Cours collectifs fitness
+  // Group fitness classes
   "Bodybalance", "Pilates", "Stretching", "Swiss Ball", "Yoga",
   "Cardio Combat", "Step", "Step Débutant", "Step Intermédiaire", "LIA",
   "Bodypump", "Body Sculpt", "Cuisses Abdos Fessiers", "RPM", "Zumba",
   "Hyrox", "HBX Boxing", "HBX Fusion", "HBX Move",
   
-  // Accès libre
+  // Open access activities
   "Cardio-musculation", "Escalade", "Golf", "Squash",
   
-  // Options personnelles
+  // Personal options
   "Repos actif", "Marche", "Étirements libres"
 ];
 
-// Macros des compléments alimentaires (par dose journalière)
+/**
+ * Macronutrient values for supplements (per daily dose)
+ */
 export const COMPLEMENTS_MACROS = {
   "Clear Whey (25 g)": { kcal: 120, P: 25, L: 0, G: 0 },
   "Créatine Creapure (5 g)": { kcal: 0, P: 0, L: 0, G: 0 },
@@ -45,6 +59,9 @@ export const COMPLEMENTS_MACROS = {
   "Magnésium (2 caps)": { kcal: 4, P: 0.1, L: 0, G: 0.9 }
 };
 
+/**
+ * List of available supplement names
+ */
 export const COMPLEMENTS = [
   "Multivitamines (3 caps)",
   "Oméga-3 (2 caps)",
@@ -54,6 +71,9 @@ export const COMPLEMENTS = [
   "Magnésium (2 caps)"
 ];
 
+/**
+ * Standard breakfast meal configuration
+ */
 export const PETIT_DEJEUNER: Meal = {
   name: "Petit-déjeuner",
   kcal: 339,
@@ -63,6 +83,9 @@ export const PETIT_DEJEUNER: Meal = {
   ingredients: "Flocons avoine 40 g + yaourt brebis 150 g + chia 10 g + purée amande 5 g + ½ pomme + cannelle/citron"
 };
 
+/**
+ * Standard snack meal configuration
+ */
 export const COLATION: Meal = {
   name: "Colation",
   kcal: 80,
@@ -72,6 +95,9 @@ export const COLATION: Meal = {
   ingredients: "1 fruit + 10 amandes"
 };
 
+/**
+ * Available snack options with their macronutrient values
+ */
 export const COLLATIONS: Record<string, Meal> = {
   "Fruit + amandes": {
     name: "Fruit + amandes",

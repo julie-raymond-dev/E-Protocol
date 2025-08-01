@@ -183,7 +183,7 @@ export default function RecipeManager({ isOpen, onClose }: RecipeManagerProps) {
                 Exporter
               </button>
 
-              {/* Créer nouvelle recette */}
+              {/* Create new recipe */}
               <button
                 onClick={handleCreateNew}
                 className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors"

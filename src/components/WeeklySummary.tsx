@@ -107,7 +107,7 @@ export default function WeeklySummary({ isOpen, onClose, weeklyData }: WeeklySum
             </div>
           </div>
 
-          {/* Activités */}
+          {/* Activities */}
           <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
               Activités Physiques
@@ -186,7 +186,7 @@ export default function WeeklySummary({ isOpen, onClose, weeklyData }: WeeklySum
             </div>
           </div>
 
-          {/* Badge de Réussite */}
+          {/* Achievement Badge */}
           <div className="text-center">
             <div className="inline-flex items-center gap-3 bg-emerald-100 text-emerald-800 px-6 py-3 rounded-full">
               <Award className="h-6 w-6" />

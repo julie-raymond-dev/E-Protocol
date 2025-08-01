@@ -2,14 +2,27 @@ import { Edit2, Trash2, Clock, Users } from 'lucide-react';
 import { Recipe } from '../services/recipeStorage';
 import { useRecipes } from '../hooks/useRecipes';
 
+/**
+ * Props for the RecipeCard component
+ */
 interface RecipeCardProps {
   readonly recipe: Recipe;
   readonly onEdit: () => void;
 }
 
+/**
+ * Recipe card component displaying recipe information with edit/delete actions
+ * @param {RecipeCardProps} props - Component props
+ * @param {Recipe} props.recipe - Recipe data to display
+ * @param {function} props.onEdit - Callback function to edit the recipe
+ * @returns {JSX.Element} Recipe card component
+ */
 export default function RecipeCard({ recipe, onEdit }: RecipeCardProps) {
   const { deleteRecipe } = useRecipes();
 
+  /**
+   * Handles recipe deletion with confirmation dialog
+   */
   const handleDelete = async () => {
     if (window.confirm(`Êtes-vous sûr de vouloir supprimer la recette "${recipe.name}" ?`)) {
       try {
@@ -20,6 +33,11 @@ export default function RecipeCard({ recipe, onEdit }: RecipeCardProps) {
     }
   };
 
+  /**
+   * Returns the appropriate color class for recipe type
+   * @param {Recipe['type']} type - Recipe type
+   * @returns {string} CSS class for type color
+   */
   const getTypeColor = (type: Recipe['type']) => {
     switch (type) {
       case 'dejeuner':
@@ -33,6 +51,11 @@ export default function RecipeCard({ recipe, onEdit }: RecipeCardProps) {
     }
   };
 
+  /**
+   * Returns the display label for recipe type
+   * @param {Recipe['type']} type - Recipe type
+   * @returns {string} Human-readable type label
+   */
   const getTypeLabel = (type: Recipe['type']) => {
     switch (type) {
       case 'dejeuner':
@@ -106,7 +129,7 @@ export default function RecipeCard({ recipe, onEdit }: RecipeCardProps) {
         </div>
       </div>
 
-      {/* Ingrédients */}
+      {/* Ingredients */}
       <div className="p-4">
         <div className="flex items-center gap-2 mb-2">
           <Users className="h-4 w-4 text-gray-500" />

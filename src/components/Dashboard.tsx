@@ -281,11 +281,11 @@ export default function Dashboard() {
         types: ['Bodypump', 'Yoga', 'Cardio-musculation', 'Pilates']
       },
       meals: {
-        planned: 35, // 5 repas x 7 jours
+        planned: 35, // 5 meals x 7 days
         completed: 32
       },
       complements: {
-        planned: 42, // 6 compléments x 7 jours
+        planned: 42, // 6 supplements x 7 days
         completed: 38
       }
     };
@@ -328,7 +328,7 @@ export default function Dashboard() {
       </div>
 
       <div className="p-4 space-y-6">
-        {/* Bouton récapitulatif hebdomadaire (affiché uniquement le dimanche) */}
+        {/* Weekly summary button (displayed only on Sundays) */}
         {isSunday && (
           <div className="bg-gradient-to-r from-emerald-500 to-blue-500 rounded-xl p-4 text-white">
             <div className="flex items-center justify-between">
@@ -431,7 +431,7 @@ export default function Dashboard() {
           />
         </div>
 
-        {/* Compléments */}
+        {/* Supplements */}
         <div className="space-y-4">
           <h2 className="text-lg font-semibold text-gray-900">Compléments</h2>
           <ComplementsCard
@@ -457,7 +457,7 @@ export default function Dashboard() {
         })()}
         meals={mealSelector.type === 'colation' ? COLLATIONS : PLATS}
         selectedMeal={mealSelector.type ? getCurrentMealKey(mealSelector.type) : ''}
-        onSelectMeal={(mealKey) => {
+        onSelectMeal={(mealKey: string) => {
           if (mealSelector.type) {
             handleMealSelection(mealSelector.type, mealKey);
           }
