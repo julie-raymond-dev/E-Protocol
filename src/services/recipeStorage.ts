@@ -18,7 +18,7 @@ export interface Recipe {
   P: number;
   L: number;
   G: number;
-  type: 'dejeuner' | 'diner' | 'collation';
+  type: 'petitDejeuner' | 'dejeuner' | 'diner' | 'collation';
   ingredients: Ingredient[];
   createdAt: string;
   updatedAt: string;
