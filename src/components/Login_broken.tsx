@@ -4,7 +4,11 @@ import { useState, useEffect } from 'react';
 import logoImage from '../assets/e-protocol-logo.jpg';
 
 /**
- * Login component providing Auth0 authentication interface
+ * Login component providing Auth0 au        onMouseMove={handleMouseMove}
+        aria-label="Page de connexion"
+      >
+        {renderBackgroundEffect()}
+        <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md text-center relative z-30">{/* Loader au dessus */}ication interface
  * @returns {JSX.Element} Login form with Auth0 integration
  */
 export default function Login() {
@@ -133,48 +137,48 @@ export default function Login() {
             key={point.id}
             className="absolute pointer-events-none"
             style={{
-              left: point.x - 8,
-              top: point.y - 8,
-              width: '16px',
-              height: '16px',
+              left: point.x - 15,
+              top: point.y - 15,
+              width: '30px',
+              height: '30px',
             }}
           >
-            {/* Explosion centrale lente - plus petite */}
+            {/* Explosion centrale lente */}
             <div
               className="absolute inset-0 rounded-full"
               style={{
-                backgroundColor: 'rgba(0, 0, 0, 1)',
-                boxShadow: '0 0 12px rgba(43, 100, 84, 0.74)',
-                transform: `scale(${lifeProgress * 1.2})`,
-                opacity: lifeProgress * 0.6,
-                animation: 'slow-explosion 2.5s ease-out forwards',
+                backgroundColor: 'rgba(4, 120, 87, 0.6)',
+                boxShadow: '0 0 20px rgba(4, 120, 87, 0.8)',
+                transform: `scale(${lifeProgress * 2})`,
+                opacity: lifeProgress * 0.7,
+                animation: 'slow-explosion 3s ease-out forwards',
               }}
             />
             
-            {/* Cercles d'expansion lents - plus petits */}
+            {/* Cercles d'expansion lents */}
             <div
-              className="absolute inset-0 rounded-full border"
+              className="absolute inset-0 rounded-full border-2"
               style={{
-                borderColor: 'rgba(4, 120, 87, 0.3)',
-                transform: `scale(${1 + (1 - lifeProgress) * 0.8})`,
-                opacity: lifeProgress * 0.4,
-                animation: 'slow-ring-expansion 2s ease-out forwards',
+                borderColor: 'rgba(4, 120, 87, 0.4)',
+                transform: `scale(${1 + (1 - lifeProgress) * 1.5})`,
+                opacity: lifeProgress * 0.5,
+                animation: 'slow-ring-expansion 2.5s ease-out forwards',
               }}
             />
             
-            {/* Petites particules qui s'éparpillent lentement - plus petites */}
+            {/* Petites particules qui s'éparpillent lentement */}
             {[0, 72, 144, 216, 288].map((angle) => (
               <div
                 key={`particle-${point.id}-${angle}`}
-                className="absolute w-1 h-1 rounded-full"
+                className="absolute w-1.5 h-1.5 rounded-full"
                 style={{
-                  backgroundColor: 'rgba(4, 120, 87, 0.7)',
+                  backgroundColor: 'rgba(4, 120, 87, 0.8)',
                   left: '50%',
                   top: '50%',
-                  transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(-${6 + (1 - lifeProgress) * 8}px)`,
-                  opacity: lifeProgress * 0.8,
-                  boxShadow: '0 0 3px rgba(4, 120, 87, 0.5)',
-                  transition: 'all 0.2s ease-out',
+                  transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(-${10 + (1 - lifeProgress) * 15}px)`,
+                  opacity: lifeProgress * 0.9,
+                  boxShadow: '0 0 6px rgba(4, 120, 87, 0.6)',
+                  transition: 'all 0.3s ease-out',
                 }}
               />
             ))}
@@ -188,21 +192,21 @@ export default function Login() {
             opacity: 1; 
           }
           50% { 
-            transform: scale(0.8); 
-            opacity: 0.6; 
+            transform: scale(1.2); 
+            opacity: 0.8; 
           }
           100% { 
-            transform: scale(1.2); 
+            transform: scale(2); 
             opacity: 0; 
           }
         }
         @keyframes slow-ring-expansion {
           0% { 
-            transform: scale(0.3); 
-            opacity: 0.6; 
+            transform: scale(0.5); 
+            opacity: 0.8; 
           }
           100% { 
-            transform: scale(1.8); 
+            transform: scale(3); 
             opacity: 0; 
           }
         }
@@ -237,7 +241,7 @@ export default function Login() {
         aria-label="Page de connexion"
       >
         {renderBackgroundEffect()}
-        <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md text-center relative z-30">
+        <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md text-center relative z-10">
           <Loader className="h-8 w-8 animate-spin text-emerald-600 mx-auto mb-4" />
           <p className="text-gray-600">Chargement...</p>
         </div>
