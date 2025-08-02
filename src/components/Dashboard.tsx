@@ -5,6 +5,7 @@ import { getDayProgress, saveDayProgress, updateSelectedMeals, updateSelectedAct
 import { DayProtocol, DayProgress, Meal, UserProfile } from '../types';
 import { PLATS, COLLATIONS, COMPLEMENTS_MACROS, PETIT_DEJEUNER } from '../data/protocol';
 import { userProfileService } from '../services/userProfileService';
+import { calculateCaloriesBurned, getActivityMet } from '../data/activities-met';
 import MacroCard from './MacroCard';
 import MealCard from './MealCard';
 import SportCard from './SportCard';
@@ -371,12 +372,31 @@ const Dashboard = forwardRef<DashboardRef, DashboardProps>(({ onOpenProfile }, r
   };
 
   /**
+   * Calculates calories burned from completed activities
+   */
+  const getCaloriesBurnedFromSport = (): number => {
+    if (!progress?.sport || !protocol?.sport || !userProfile) {
+      return 0;
+    }
+
+    const met = getActivityMet(protocol.sport);
+    if (!met) return 0;
+
+    // Calculate calories burned for 45 minutes (default duration)
+    return calculateCaloriesBurned(protocol.sport, userProfile.poids, 45);
+  };
+
+  /**
    * Gets the current nutritional objectives (from user profile or default values)
+   * Includes bonus calories from completed sports activities
    */
   const getCurrentObjectives = () => {
     if (userProfile) {
+      const baseCalories = userProfile.calories_cibles;
+      const bonusCalories = getCaloriesBurnedFromSport();
+      
       return {
-        KCAL: userProfile.calories_cibles,
+        KCAL: baseCalories + bonusCalories,
         P: userProfile.macros_cibles.proteines,
         L: userProfile.macros_cibles.lipides,
         G: userProfile.macros_cibles.glucides
@@ -390,6 +410,14 @@ const Dashboard = forwardRef<DashboardRef, DashboardProps>(({ onOpenProfile }, r
       L: 0,
       G: 0
     };
+  };
+
+  /**
+   * Gets the calories label with sport bonus information
+   */
+  const getCaloriesLabel = (): string => {
+    const bonusCalories = getCaloriesBurnedFromSport();
+    return bonusCalories > 0 ? `Calories (+${Math.round(bonusCalories)} sport)` : 'Calories';
   };
 
   // Check if it's Sunday to display the summary
@@ -492,7 +520,7 @@ const Dashboard = forwardRef<DashboardRef, DashboardProps>(({ onOpenProfile }, r
         {/* Macros Overview */}
         <div className="grid grid-cols-2 gap-4">
           <MacroCard
-            label="Calories"
+            label={getCaloriesLabel()}
             value={actualMacros.kcal}
             objective={getCurrentObjectives().KCAL}
             unit=""
