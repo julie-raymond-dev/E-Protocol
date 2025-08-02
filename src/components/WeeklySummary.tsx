@@ -47,6 +47,51 @@ export default function WeeklySummary({ isOpen, onClose, weeklyData }: WeeklySum
     return 'bg-red-100 text-red-800 border-red-200';
   };
 
+  const getWeeklyMessage = () => {
+    const caloriesPercentage = calculatePercentage(
+      weeklyData.objectives.calories.achieved, 
+      weeklyData.objectives.calories.target
+    );
+
+    if (caloriesPercentage >= 95) {
+      return {
+        message: "Excellent travail cette semaine ! 🏆",
+        style: "bg-emerald-100 text-emerald-800",
+        icon: <Award className="h-6 w-6" />
+      };
+    } else if (caloriesPercentage >= 85) {
+      return {
+        message: "Très bonne semaine ! 🎯",
+        style: "bg-blue-100 text-blue-800", 
+        icon: <Target className="h-6 w-6" />
+      };
+    } else if (caloriesPercentage >= 70) {
+      return {
+        message: "Bonne progression ! 📈",
+        style: "bg-yellow-100 text-yellow-800",
+        icon: <TrendingUp className="h-6 w-6" />
+      };
+    } else if (caloriesPercentage >= 50) {
+      return {
+        message: "Continue tes efforts ! 💪",
+        style: "bg-orange-100 text-orange-800",
+        icon: <TrendingUp className="h-6 w-6" />
+      };
+    } else if (caloriesPercentage >= 25) {
+      return {
+        message: "Il faut se reprendre ! 📉",
+        style: "bg-red-100 text-red-800",
+        icon: <TrendingDown className="h-6 w-6" />
+      };
+    } else {
+      return {
+        message: "Nouvelle semaine, nouveau départ ! 🚀",
+        style: "bg-gray-100 text-gray-800",
+        icon: <Calendar className="h-6 w-6" />
+      };
+    }
+  };
+
   const macros = [
     { label: 'Calories', key: 'calories', unit: 'kcal' },
     { label: 'Protéines', key: 'proteins', unit: 'g' },
@@ -188,12 +233,17 @@ export default function WeeklySummary({ isOpen, onClose, weeklyData }: WeeklySum
 
           {/* Achievement Badge */}
           <div className="text-center">
-            <div className="inline-flex items-center gap-3 bg-emerald-100 text-emerald-800 px-6 py-3 rounded-full">
-              <Award className="h-6 w-6" />
-              <span className="font-semibold">
-                Excellent travail cette semaine ! 🏆
-              </span>
-            </div>
+            {(() => {
+              const weeklyMessage = getWeeklyMessage();
+              return (
+                <div className={`inline-flex items-center gap-3 px-6 py-3 rounded-full ${weeklyMessage.style}`}>
+                  {weeklyMessage.icon}
+                  <span className="font-semibold">
+                    {weeklyMessage.message}
+                  </span>
+                </div>
+              );
+            })()}
           </div>
         </div>
       </div>

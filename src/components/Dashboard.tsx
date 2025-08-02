@@ -536,9 +536,6 @@ const Dashboard = forwardRef<DashboardRef, DashboardProps>(({ onOpenProfile }, r
   const getWeeklySummaryData = () => {
     const { startOfWeek, endOfWeek } = getWeekDateRange(currentDate);
     
-    console.log(`🗓️ Current date: ${currentDate.toISOString().split('T')[0]}`);
-    console.log(`📅 Week range: ${startOfWeek.toISOString().split('T')[0]} to ${endOfWeek.toISOString().split('T')[0]}`);
-    
     // Initialize totals
     const totals: WeeklyTotals = {
       calories: 0,
