@@ -1,3 +1,5 @@
+import { roundTo } from '../utils/numberUtils';
+
 /**
  * Props for the MacroCard component
  */
@@ -20,7 +22,7 @@ interface MacroCardProps {
  * @returns {JSX.Element} Macro card component with progress bar
  */
 export default function MacroCard({ label, value, objective, unit, color }: MacroCardProps) {
-  const percentage = Math.round((value / objective) * 100);
+  const percentage = roundTo((value / objective) * 100, 1);
   const isComplete = percentage >= 100;
 
   return (
@@ -36,8 +38,8 @@ export default function MacroCard({ label, value, objective, unit, color }: Macr
       
       <div className="mb-2">
         <div className="flex items-baseline gap-1">
-          <span className="text-2xl font-bold text-gray-900">{Math.round(value)}</span>
-          <span className="text-sm text-gray-500">/ {objective}{unit}</span>
+          <span className="text-2xl font-bold text-gray-900">{roundTo(value, 1)}</span>
+          <span className="text-sm text-gray-500">/ {roundTo(objective, 1)}{unit}</span>
         </div>
       </div>
 
