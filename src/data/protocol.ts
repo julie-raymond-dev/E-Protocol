@@ -48,6 +48,50 @@ export const ACTIVITES = [
 ];
 
 /**
+ * Estimated calories burned for 45-minute sessions
+ * Values are averages for a 60kg person
+ */
+export const ACTIVITES_CALORIES: Record<string, number> = {
+  // Group fitness classes - Low intensity
+  "Bodybalance": 180,
+  "Pilates": 160,
+  "Stretching": 120,
+  "Swiss Ball": 170,
+  "Yoga": 140,
+  
+  // Group fitness classes - High intensity cardio
+  "Cardio Combat": 350,
+  "Step": 320,
+  "Step Débutant": 280,
+  "Step Intermédiaire": 320,
+  "LIA": 300,
+  "Zumba": 330,
+  
+  // Group fitness classes - Strength/Mixed
+  "Bodypump": 250,
+  "Body Sculpt": 240,
+  "Cuisses Abdos Fessiers": 220,
+  "RPM": 380,
+  
+  // High intensity specialized classes
+  "Hyrox": 400,
+  "HBX Boxing": 380,
+  "HBX Fusion": 320,
+  "HBX Move": 300,
+  
+  // Open access activities
+  "Cardio-musculation": 280,
+  "Escalade": 320,
+  "Golf": 200,
+  "Squash": 360,
+  
+  // Personal options
+  "Repos actif": 100,
+  "Marche": 150,
+  "Étirements libres": 90
+};
+
+/**
  * Macronutrient values for supplements (per daily dose)
  */
 export const COMPLEMENTS_MACROS = {
