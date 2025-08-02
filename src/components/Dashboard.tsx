@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { ChevronLeft, ChevronRight, Trophy } from 'lucide-react';
 import { generateDayProtocol } from '../utils/protocolGenerator';
 import { getDayProgress, saveDayProgress, updateSelectedMeals, updateSelectedActivity } from '../utils/storage';
@@ -10,6 +10,12 @@ import MealCard from './MealCard';
 import SportCard from './SportCard';
 import ComplementsCard from './ComplementsCard';
 import ProfileBanner from './ProfileBanner';
+import MealSelector from './MealSelector';
+import ActivitySelector from './ActivitySelector';
+import WeeklySummary from './WeeklySummary';
+import RecipeManager from './RecipeManager';
+import { useRecipes } from '../hooks/useRecipes';
+import { Recipe } from '../services/recipeStorage';
 
 /**
  * Type definition for meal types in the protocol
@@ -20,18 +26,15 @@ interface DashboardProps {
   readonly onOpenProfile: () => void;
 }
 
-import MealSelector from './MealSelector';
-import ActivitySelector from './ActivitySelector';
-import WeeklySummary from './WeeklySummary';
-import RecipeManager from './RecipeManager';
-import { useRecipes } from '../hooks/useRecipes';
-import { Recipe } from '../services/recipeStorage';
+export interface DashboardRef {
+  refreshProfile: () => void;
+}
 
 /**
  * Main dashboard component for displaying daily nutrition protocol and progress tracking
  * @returns {JSX.Element} Dashboard component with meal cards, activity tracking, and progress monitoring
  */
-export default function Dashboard({ onOpenProfile }: DashboardProps) {
+const Dashboard = forwardRef<DashboardRef, DashboardProps>(({ onOpenProfile }, ref) => {
   const { recipes } = useRecipes();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [protocol, setProtocol] = useState<DayProtocol>();
@@ -90,6 +93,22 @@ export default function Dashboard({ onOpenProfile }: DashboardProps) {
 
     loadUserProfile();
   }, []);
+
+  // Expose refresh method via ref
+  useImperativeHandle(ref, () => ({
+    refreshProfile: async () => {
+      try {
+        setProfileLoading(true);
+        const profile = await userProfileService.getUserProfile();
+        setUserProfile(profile);
+      } catch (error) {
+        console.error('Erreur lors du rechargement du profil:', error);
+        setUserProfile(null);
+      } finally {
+        setProfileLoading(false);
+      }
+    }
+  }));
 
   // Set up event listeners for navigation and recipe management
   useEffect(() => {
@@ -627,4 +646,8 @@ export default function Dashboard({ onOpenProfile }: DashboardProps) {
       />
     </div>
   );
-}
+});
+
+Dashboard.displayName = 'Dashboard';
+
+export default Dashboard;
