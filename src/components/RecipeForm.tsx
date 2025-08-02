@@ -8,6 +8,7 @@ interface RecipeFormProps {
   readonly isOpen: boolean;
   readonly onClose: () => void;
   readonly editingRecipe?: Recipe | null;
+  readonly defaultMealType?: Recipe['type'];
 }
 
 interface FormIngredient extends Ingredient {
@@ -19,12 +20,12 @@ interface FormIngredient extends Ingredient {
  * @param {RecipeFormProps} props - Component props containing form state and handlers
  * @returns {JSX.Element | null} The recipe form interface or null if closed
  */
-export default function RecipeForm({ isOpen, onClose, editingRecipe }: RecipeFormProps) {
+export default function RecipeForm({ isOpen, onClose, editingRecipe, defaultMealType }: RecipeFormProps) {
   const { createRecipe, updateRecipe, calculateRecipeMacros, generateRecipeId } = useRecipes();
   
   const [formData, setFormData] = useState({
     name: '',
-    type: 'dejeuner' as Recipe['type'],
+    type: defaultMealType || 'dejeuner',
   });
   
   const [ingredients, setIngredients] = useState<FormIngredient[]>([]);
@@ -71,12 +72,12 @@ export default function RecipeForm({ isOpen, onClose, editingRecipe }: RecipeFor
     } else {
       setFormData({
         name: '',
-        type: 'dejeuner',
+        type: defaultMealType || 'dejeuner',
       });
       setIngredients([createEmptyIngredient()]);
     }
     setErrors({});
-  }, [editingRecipe, isOpen, createEmptyIngredient]);
+  }, [editingRecipe, isOpen, defaultMealType, createEmptyIngredient]);
 
   const totalMacros = calculateRecipeMacros(ingredients);
 
@@ -243,6 +244,7 @@ export default function RecipeForm({ isOpen, onClose, editingRecipe }: RecipeFor
                   onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value as Recipe['type'] }))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                 >
+                  <option value="petitDejeuner">Petit déjeuner</option>
                   <option value="dejeuner">Déjeuner</option>
                   <option value="diner">Dîner</option>
                   <option value="collation">Collation</option>
