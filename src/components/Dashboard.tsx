@@ -12,13 +12,14 @@ import ComplementsCard from './ComplementsCard';
 /**
  * Type definition for meal types in the protocol
  */
-type MealType = 'dejeuner' | 'diner' | 'colation';
+type MealType = 'petitDejeuner' | 'dejeuner' | 'diner' | 'colation';
 
 import MealSelector from './MealSelector';
 import ActivitySelector from './ActivitySelector';
 import WeeklySummary from './WeeklySummary';
 import RecipeManager from './RecipeManager';
 import { useRecipes } from '../hooks/useRecipes';
+import { Recipe } from '../services/recipeStorage';
 
 /**
  * Main dashboard component for displaying daily nutrition protocol and progress tracking
@@ -36,6 +37,7 @@ export default function Dashboard() {
   const [activitySelector, setActivitySelector] = useState(false);
   const [weeklySummaryOpen, setWeeklySummaryOpen] = useState(false);
   const [recipeManagerOpen, setRecipeManagerOpen] = useState(false);
+  const [defaultMealType, setDefaultMealType] = useState<Recipe['type'] | undefined>(undefined);
 
   useEffect(() => {
     const existingProgress = getDayProgress(currentDate.toISOString().split('T')[0]);
@@ -180,6 +182,16 @@ export default function Dashboard() {
   if (!protocol || !progress) return null;
 
   /**
+   * Maps Dashboard meal type to Recipe meal type
+   * @param {MealType} dashboardType - Dashboard meal type
+   * @returns {Recipe['type']} Recipe meal type
+   */
+  const mapToRecipeType = (dashboardType: MealType): Recipe['type'] => {
+    if (dashboardType === 'colation') return 'collation';
+    return dashboardType;
+  };
+
+  /**
    * Combines static meals with custom recipes by meal type
    * @param {MealType} mealType - Type of meal to get options for
    * @returns {Record<string, Meal>} Combined meal options
@@ -189,14 +201,18 @@ export default function Dashboard() {
     
     if (mealType === 'colation') {
       staticMeals = { ...COLLATIONS };
+    } else if (mealType === 'petitDejeuner') {
+      // Pour les petits déjeuners, on peut utiliser PLATS ou créer une section spécifique
+      staticMeals = { ...PLATS };
     } else {
       staticMeals = { ...PLATS };
     }
 
     // Add custom recipes of the same type
     const customRecipes: Record<string, Meal> = {};
+    const recipeType = mapToRecipeType(mealType);
     recipes
-      .filter(recipe => recipe.type === mealType)
+      .filter(recipe => recipe.type === recipeType)
       .forEach(recipe => {
         customRecipes[recipe.id] = {
           name: recipe.name,
@@ -221,6 +237,10 @@ export default function Dashboard() {
   const getCurrentMealKey = (mealType: MealType): string => {
     if (mealType === 'colation') {
       return progress.selectedMeals?.colation || 'Fruit + amandes';
+    }
+    
+    if (mealType === 'petitDejeuner') {
+      return progress.selectedMeals?.petitDejeuner || protocol.petitDejeuner.name;
     }
     
     const mealName = protocol[mealType].name;
@@ -435,6 +455,8 @@ export default function Dashboard() {
             meal={protocol.petitDejeuner}
             completed={progress.petitDejeuner}
             onToggle={() => updateProgress({ petitDejeuner: !progress.petitDejeuner })}
+            canChange={true}
+            onChangeClick={() => openMealSelector('petitDejeuner')}
           />
           
           <MealCard
@@ -499,6 +521,7 @@ export default function Dashboard() {
         isOpen={mealSelector.isOpen}
         onClose={closeMealSelector}
         title={(() => {
+          if (mealSelector.type === 'petitDejeuner') return 'Choisir le petit déjeuner';
           if (mealSelector.type === 'dejeuner') return 'Choisir le déjeuner';
           if (mealSelector.type === 'diner') return 'Choisir le dîner';
           return 'Choisir la collation';
@@ -509,6 +532,13 @@ export default function Dashboard() {
           if (mealSelector.type) {
             handleMealSelection(mealSelector.type, mealKey);
           }
+        }}
+        mealType={mealSelector.type || undefined}
+        onCreateNew={() => {
+          if (mealSelector.type) {
+            setDefaultMealType(mapToRecipeType(mealSelector.type));
+          }
+          setRecipeManagerOpen(true);
         }}
       />
 
@@ -529,7 +559,11 @@ export default function Dashboard() {
       {/* Recipe Manager Modal */}
       <RecipeManager
         isOpen={recipeManagerOpen}
-        onClose={() => setRecipeManagerOpen(false)}
+        onClose={() => {
+          setRecipeManagerOpen(false);
+          setDefaultMealType(undefined);
+        }}
+        defaultMealType={defaultMealType}
       />
     </div>
   );
