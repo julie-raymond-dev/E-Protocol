@@ -463,19 +463,11 @@ const Dashboard = forwardRef<DashboardRef, DashboardProps>(({ onOpenProfile }, r
    * Adds macros from a meal to the running totals
    */
   const addMealMacros = (meal: MealWithMacros, totals: WeeklyTotals) => {
-    console.log('🍽️ Adding meal macros:', meal);
     totals.calories += meal.kcal;
     totals.proteins += meal.P;
     totals.lipids += meal.L;
     totals.carbs += meal.G;
     totals.completedMeals++;
-    console.log('📊 Updated totals after meal:', {
-      calories: totals.calories,
-      proteins: totals.proteins,
-      lipids: totals.lipids,
-      carbs: totals.carbs,
-      completedMeals: totals.completedMeals
-    });
   };
 
   /**
@@ -553,8 +545,6 @@ const Dashboard = forwardRef<DashboardRef, DashboardProps>(({ onOpenProfile }, r
       const dateString = date.toISOString().split('T')[0];
       const dayProgress = getDayProgress(dateString);
       
-      console.log(`📅 Day ${i + 1} (${dateString}):`, dayProgress ? '✅ Has progress' : '❌ No progress');
-      
       // Get the protocol for this day (even if no progress exists)
       const customMeals = dayProgress?.selectedMeals;
       const customActivity = dayProgress?.selectedActivity;
@@ -565,22 +555,6 @@ const Dashboard = forwardRef<DashboardRef, DashboardProps>(({ onOpenProfile }, r
       
       // Only calculate consumed macros if day has progress
       if (dayProgress) {
-        console.log(`🔍 Processing day ${dateString} with progress:`, {
-          petitDejeuner: dayProgress.petitDejeuner,
-          dejeuner: dayProgress.dejeuner,
-          diner: dayProgress.diner,
-          colation: dayProgress.colation,
-          clearWhey: dayProgress.clearWhey,
-          sport: dayProgress.sport,
-          complements: dayProgress.complements
-        });
-        console.log(`📋 Day protocol for ${dateString}:`, {
-          petitDejeuner: dayProtocol.petitDejeuner,
-          dejeuner: dayProtocol.dejeuner,
-          diner: dayProtocol.diner,
-          colation: dayProtocol.colation,
-          clearWhey: dayProtocol.clearWhey
-        });
         processDayMeals(dayProgress, dayProtocol, totals);
         processDayActivitiesAndComplements(dayProgress, dayProtocol, totals);
       }
@@ -588,10 +562,7 @@ const Dashboard = forwardRef<DashboardRef, DashboardProps>(({ onOpenProfile }, r
 
     const weeklyTargets = getWeeklyTargets();
 
-    console.log('🎯 Final weekly totals:', totals);
-    console.log('🏆 Weekly targets:', weeklyTargets);
-
-    const weeklyData = {
+    return {
       week: `${startOfWeek.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} - ${endOfWeek.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}`,
       objectives: {
         calories: { achieved: Math.round(totals.calories), target: weeklyTargets.calories },
@@ -613,10 +584,6 @@ const Dashboard = forwardRef<DashboardRef, DashboardProps>(({ onOpenProfile }, r
         completed: totals.completedComplements
       }
     };
-
-    console.log('📊 Weekly summary data sent to popup:', weeklyData);
-
-    return weeklyData;
   };
 
   const actualMacros = calculateActualMacros();
