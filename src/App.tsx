@@ -1,7 +1,7 @@
 import { useAuth0 } from '@auth0/auth0-react';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Login from './components/Login';
-import Dashboard from './components/Dashboard';
+import Dashboard, { DashboardRef } from './components/Dashboard';
 import Navbar from './components/Navbar';
 import UserProfile from './components/UserProfile';
 import { RecipesProvider } from './contexts/RecipesContext';
@@ -14,6 +14,17 @@ import { Loader } from 'lucide-react';
 function App() {
   const { isLoading, isAuthenticated } = useAuth0();
   const [userProfileOpen, setUserProfileOpen] = useState(false);
+  const dashboardRef = useRef<DashboardRef>(null);
+
+  /**
+   * Handler called when the user profile changes (created, updated, or deleted)
+   */
+  const handleProfileChange = () => {
+    // Refresh the Dashboard's profile data
+    if (dashboardRef.current) {
+      dashboardRef.current.refreshProfile();
+    }
+  };
 
   if (isLoading) {
     return (
@@ -31,10 +42,14 @@ function App() {
     <div className="min-h-screen bg-gray-50">
       <RecipesProvider>
         <Navbar onOpenProfile={() => setUserProfileOpen(true)} />
-        <Dashboard onOpenProfile={() => setUserProfileOpen(true)} />
+        <Dashboard 
+          ref={dashboardRef}
+          onOpenProfile={() => setUserProfileOpen(true)} 
+        />
         <UserProfile 
           isOpen={userProfileOpen} 
-          onClose={() => setUserProfileOpen(false)} 
+          onClose={() => setUserProfileOpen(false)}
+          onProfileChange={handleProfileChange}
         />
       </RecipesProvider>
     </div>
