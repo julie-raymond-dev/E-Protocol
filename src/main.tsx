@@ -17,13 +17,7 @@ if (isDemoMode) {
   // Mode démo - Application sans authentification
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-blue-50">
-        <div className="bg-gradient-to-r from-emerald-500 to-blue-500 text-white p-4 text-center">
-          <h2 className="text-lg font-semibold">🚀 Demo Mode - E-Protocol</h2>
-          <p className="text-sm opacity-90">Full functionality available without authentication</p>
-        </div>
-        <App />
-      </div>
+      <App />
     </StrictMode>
   );
 } else {
