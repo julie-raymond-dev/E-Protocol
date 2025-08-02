@@ -39,6 +39,18 @@ export default function MacroCard({ label, value, objective, unit, color }: Macr
     badgeClasses += 'bg-gray-200 text-gray-600';
   }
 
+  // Determine progress bar color based on completion status
+  let progressBarColor = '';
+  if (!hasProgress || !hasObjective) {
+    progressBarColor = 'bg-gray-300';
+  } else if (percentage > 100) {
+    progressBarColor = 'bg-red-500';
+  } else if (percentage === 100) {
+    progressBarColor = 'bg-emerald-500';
+  } else {
+    progressBarColor = color;
+  }
+
   return (
     <div className="bg-gray-50 rounded-xl p-4">
       <div className="flex items-center justify-between mb-2">
@@ -59,15 +71,7 @@ export default function MacroCard({ label, value, objective, unit, color }: Macr
 
       <div className="w-full bg-gray-200 rounded-full h-2">
         <div
-          className={`h-2 rounded-full transition-all duration-300 ${
-            !hasProgress || !hasObjective 
-              ? 'bg-gray-300'
-              : percentage > 100
-                ? 'bg-red-500'
-                : percentage === 100
-                  ? 'bg-emerald-500'
-                  : color
-          }`}
+          className={`h-2 rounded-full transition-all duration-300 ${progressBarColor}`}
           style={{ 
             width: hasObjective && hasProgress ? `${Math.min(percentage, 100)}%` : '0%' 
           }}
