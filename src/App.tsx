@@ -1,7 +1,9 @@
 import { useAuth0 } from '@auth0/auth0-react';
+import { useState } from 'react';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import Navbar from './components/Navbar';
+import UserProfile from './components/UserProfile';
 import { RecipesProvider } from './contexts/RecipesContext';
 import { Loader } from 'lucide-react';
 
@@ -11,14 +13,12 @@ import { Loader } from 'lucide-react';
  */
 function App() {
   const { isLoading, isAuthenticated } = useAuth0();
+  const [userProfileOpen, setUserProfileOpen] = useState(false);
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <Loader className="h-12 w-12 animate-spin text-emerald-600 mx-auto mb-4" />
-          <p className="text-gray-600">Chargement...</p>
-        </div>
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader className="w-8 h-8 animate-spin text-blue-600" />
       </div>
     );
   }
@@ -30,8 +30,12 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-50">
       <RecipesProvider>
-        <Navbar />
-        <Dashboard />
+        <Navbar onOpenProfile={() => setUserProfileOpen(true)} />
+        <Dashboard onOpenProfile={() => setUserProfileOpen(true)} />
+        <UserProfile 
+          isOpen={userProfileOpen} 
+          onClose={() => setUserProfileOpen(false)} 
+        />
       </RecipesProvider>
     </div>
   );
