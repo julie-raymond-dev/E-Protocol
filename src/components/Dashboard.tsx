@@ -23,6 +23,31 @@ import { Recipe } from '../services/recipeStorage';
  */
 type MealType = 'petitDejeuner' | 'dejeuner' | 'diner' | 'colation';
 
+/**
+ * Type for weekly summary totals tracking
+ */
+interface WeeklyTotals {
+  calories: number;
+  proteins: number;
+  lipids: number;
+  carbs: number;
+  completedActivities: number;
+  completedMeals: number;
+  completedComplements: number;
+  plannedComplements: number;
+  activityTypes: Set<string>;
+}
+
+/**
+ * Type for meal with macro information
+ */
+interface MealWithMacros {
+  kcal: number;
+  P: number;
+  L: number;
+  G: number;
+}
+
 interface DashboardProps {
   readonly onOpenProfile: () => void;
 }
@@ -423,35 +448,138 @@ const Dashboard = forwardRef<DashboardRef, DashboardProps>(({ onOpenProfile }, r
   // Check if it's Sunday to display the summary
   const isSunday = currentDate.getDay() === 0;
 
-  // Simulated data for weekly summary
-  const getWeeklySummaryData = () => {
+  /**
+   * Calculates the date range for the current week (Monday to Sunday)
+   */
+  const getWeekDateRange = (currentDate: Date) => {
     const startOfWeek = new Date(currentDate);
     startOfWeek.setDate(currentDate.getDate() - currentDate.getDay() + 1);
     const endOfWeek = new Date(startOfWeek);
     endOfWeek.setDate(startOfWeek.getDate() + 6);
+    return { startOfWeek, endOfWeek };
+  };
 
-    const currentObjectives = getCurrentObjectives();
+  /**
+   * Adds macros from a meal to the running totals
+   */
+  const addMealMacros = (meal: MealWithMacros, totals: WeeklyTotals) => {
+    totals.calories += meal.kcal;
+    totals.proteins += meal.P;
+    totals.lipids += meal.L;
+    totals.carbs += meal.G;
+    totals.completedMeals++;
+  };
+
+  /**
+   * Processes macros for all completed meals in a day
+   */
+  const processDayMeals = (dayProgress: DayProgress, dayProtocol: DayProtocol, totals: WeeklyTotals) => {
+    const mealTypes = [
+      { key: 'petitDejeuner', meal: dayProtocol.petitDejeuner },
+      { key: 'dejeuner', meal: dayProtocol.dejeuner },
+      { key: 'diner', meal: dayProtocol.diner },
+      { key: 'colation', meal: dayProtocol.colation },
+      { key: 'clearWhey', meal: dayProtocol.clearWhey }
+    ];
+
+    mealTypes.forEach(({ key, meal }) => {
+      if (dayProgress[key as keyof DayProgress]) {
+        addMealMacros(meal, totals);
+      }
+    });
+  };
+
+  /**
+   * Processes activities and complements for a day
+   */
+  const processDayActivitiesAndComplements = (
+    dayProgress: DayProgress, 
+    dayProtocol: DayProtocol, 
+    totals: WeeklyTotals
+  ) => {
+    // Count completed activities
+    if (dayProgress.sport) {
+      totals.completedActivities++;
+      totals.activityTypes.add(dayProtocol.sport);
+    }
+    
+    // Count completed complements
+    totals.completedComplements += dayProgress.complements.filter(Boolean).length;
+  };
+
+  /**
+   * Calculates weekly targets based on user profile
+   */
+  const getWeeklyTargets = () => {
+    if (!userProfile) return { calories: 0, proteins: 0, lipids: 0, carbs: 0 };
+    
+    return {
+      calories: userProfile.calories_cibles * 7,
+      proteins: userProfile.macros_cibles.proteines * 7,
+      lipids: userProfile.macros_cibles.lipides * 7,
+      carbs: userProfile.macros_cibles.glucides * 7
+    };
+  };
+
+  // Real data calculation for weekly summary
+  const getWeeklySummaryData = () => {
+    const { startOfWeek, endOfWeek } = getWeekDateRange(currentDate);
+    
+    // Initialize totals
+    const totals: WeeklyTotals = {
+      calories: 0,
+      proteins: 0,
+      lipids: 0,
+      carbs: 0,
+      completedActivities: 0,
+      completedMeals: 0,
+      completedComplements: 0,
+      plannedComplements: 0,
+      activityTypes: new Set<string>()
+    };
+
+    // Calculate for each day of the week
+    for (let date = new Date(startOfWeek); date <= endOfWeek; date.setDate(date.getDate() + 1)) {
+      const dateString = date.toISOString().split('T')[0];
+      const dayProgress = getDayProgress(dateString);
+      
+      // Get the protocol for this day (even if no progress exists)
+      const customMeals = dayProgress?.selectedMeals;
+      const customActivity = dayProgress?.selectedActivity;
+      const dayProtocol = generateDayProtocol(date, customMeals, customActivity, recipes);
+      
+      // Count planned complements for this day
+      totals.plannedComplements += dayProtocol.complements.length;
+      
+      // Only calculate consumed macros if day has progress
+      if (dayProgress) {
+        processDayMeals(dayProgress, dayProtocol, totals);
+        processDayActivitiesAndComplements(dayProgress, dayProtocol, totals);
+      }
+    }
+
+    const weeklyTargets = getWeeklyTargets();
 
     return {
       week: `${startOfWeek.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} - ${endOfWeek.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}`,
       objectives: {
-        calories: { achieved: 1650, target: currentObjectives.KCAL },
-        proteins: { achieved: 95, target: currentObjectives.P },
-        lipids: { achieved: 45, target: currentObjectives.L },
-        carbs: { achieved: 210, target: currentObjectives.G },
+        calories: { achieved: Math.round(totals.calories), target: weeklyTargets.calories },
+        proteins: { achieved: Math.round(totals.proteins), target: weeklyTargets.proteins },
+        lipids: { achieved: Math.round(totals.lipids), target: weeklyTargets.lipids },
+        carbs: { achieved: Math.round(totals.carbs), target: weeklyTargets.carbs },
       },
       activities: {
-        planned: 5,
-        completed: 4,
-        types: ['Bodypump', 'Yoga', 'Cardio-musculation', 'Pilates']
+        planned: 7, // 1 activity per day max
+        completed: totals.completedActivities,
+        types: Array.from(totals.activityTypes)
       },
       meals: {
         planned: 35, // 5 meals x 7 days
-        completed: 32
+        completed: totals.completedMeals
       },
       complements: {
-        planned: 42, // 6 supplements x 7 days
-        completed: 38
+        planned: totals.plannedComplements,
+        completed: totals.completedComplements
       }
     };
   };
