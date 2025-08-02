@@ -1,5 +1,6 @@
 import { useAuth0 } from '@auth0/auth0-react';
-import { User, LogIn, Loader } from 'lucide-react';
+import { LogIn, Loader } from 'lucide-react';
+import logoImage from '../assets/e-protocol-logo.jpg';
 
 /**
  * Login component providing Auth0 authentication interface
@@ -30,8 +31,12 @@ export default function Login() {
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-blue-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="bg-emerald-100 rounded-full p-4 w-20 h-20 mx-auto mb-4 flex items-center justify-center">
-            <User className="h-10 w-10 text-emerald-600" />
+          <div className="w-20 h-20 mx-auto mb-4 rounded-full overflow-hidden border-4 border-emerald-100 shadow-lg">
+            <img 
+              src={logoImage} 
+              alt="E-Protocol Logo" 
+              className="w-full h-full object-cover"
+            />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">E-Protocol</h1>
           <p className="text-gray-600">Accès sécurisé avec Auth0</p>
