@@ -39,6 +39,7 @@ export interface DayProgress {
   sport: boolean;
   complements: boolean[];
   selectedMeals?: {
+    petitDejeuner?: string;
     dejeuner?: string;
     diner?: string;
     colation?: string;
