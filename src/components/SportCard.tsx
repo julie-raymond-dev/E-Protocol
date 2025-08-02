@@ -1,14 +1,45 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import { Check, Dumbbell, ChevronDown } from 'lucide-react';
+import { calculateCaloriesBurned, getActivityMet } from '../data/activities-met';
+import { userProfileService } from '../services/userProfileService';
+import { UserProfile } from '../types';
 
 interface SportCardProps {
-  activity: string;
-  completed: boolean;
-  onToggle: () => void;
-  onChangeClick?: () => void;
+  readonly activity: string;
+  readonly completed: boolean;
+  readonly onToggle: () => void;
+  readonly onChangeClick?: () => void;
 }
 
 export default function SportCard({ activity, completed, onToggle, onChangeClick }: SportCardProps) {
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+
+  useEffect(() => {
+    const loadUserProfile = async () => {
+      try {
+        const profile = await userProfileService.getUserProfile();
+        setUserProfile(profile);
+      } catch (error) {
+        console.error('Erreur lors du chargement du profil:', error);
+      }
+    };
+
+    loadUserProfile();
+  }, []);
+
+  // Calculate calories burned for this activity
+  const getCaloriesInfo = () => {
+    const met = getActivityMet(activity);
+    if (!met) return { calories: 0, metValue: 0 };
+
+    // Use user weight if available, otherwise default to 60kg
+    const weight = userProfile?.poids || 60;
+    const calories = calculateCaloriesBurned(activity, weight, 45);
+    
+    return { calories, metValue: met };
+  };
+
+  const { calories, metValue } = getCaloriesInfo();
   return (
     <div className={`bg-white rounded-xl p-4 border-2 transition-all duration-200 ${
       completed ? 'border-emerald-200 bg-emerald-50' : 'border-gray-200 hover:border-emerald-200'
@@ -34,7 +65,12 @@ export default function SportCard({ activity, completed, onToggle, onChangeClick
                 </button>
               )}
             </div>
-            <p className="text-sm text-gray-600">Activité UCPA</p>
+            <p className="text-sm text-gray-600">
+              {calories > 0 ? `~${calories} kcal (45 min)` : 'Activité physique'}
+              {metValue > 0 && (
+                <span className="text-xs text-gray-500 ml-1">• MET {metValue}</span>
+              )}
+            </p>
           </div>
         </div>
       </div>
