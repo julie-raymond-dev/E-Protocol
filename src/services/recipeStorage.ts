@@ -42,7 +42,7 @@ export interface ExportData {
 export class RecipeStorageService {
   private db: IDBDatabase | null = null;
   private readonly DB_NAME = 'E-Protocol-DB';
-  private readonly DB_VERSION = 1;
+  private readonly DB_VERSION = 2; // Updated to match userProfileService
 
   /**
    * Initializes the IndexedDB database and creates necessary object stores
@@ -65,6 +65,11 @@ export class RecipeStorageService {
         if (!this.db.objectStoreNames.contains('ingredients')) {
           const ingredientStore = this.db.createObjectStore('ingredients', { keyPath: 'id' });
           ingredientStore.createIndex('name', 'name', { unique: false });
+        }
+
+        // Create userProfile store if it doesn't exist (for compatibility)
+        if (!this.db.objectStoreNames.contains('userProfile')) {
+          this.db.createObjectStore('userProfile', { keyPath: 'id' });
         }
       };
 
