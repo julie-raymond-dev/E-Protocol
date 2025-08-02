@@ -108,17 +108,18 @@ export class UserProfileService {
     glucides: number;
   } {
     if (regimeType === 'proteine_glucides_reduits') {
-      // Régime Ultra-Protéiné / Low Carb (sèche)
-      // Protéines: 2.2 à 2.8 g/kg (30-35% des calories)
-      // Glucides: ≤75g/jour (15-20% max des calories)
-      // Lipides: Le reste (45-55% des calories)
+      // Régime Low Carb High Protein
+      // Protéines: 40% des calories
+      // Lipides: 40% des calories
+      // Glucides: 20% des calories
       
-      const proteines = Math.round(poids * 2.5); // 2.5g/kg (milieu de la fourchette)
-      const glucides = Math.min(75, Math.round((calories * 0.18) / 4)); // Max 75g ou 18% des calories
+      const proteinCalories = calories * 0.40; // 40% des calories
+      const lipidCalories = calories * 0.40;   // 40% des calories
+      const glucideCalories = calories * 0.20; // 20% des calories
       
-      const proteinCalories = proteines * 4;
-      const glucideCalories = glucides * 4;
-      const lipides = Math.round((calories - proteinCalories - glucideCalories) / 9);
+      const proteines = Math.round(proteinCalories / 4); // 1g protéine = 4 kcal
+      const lipides = Math.round(lipidCalories / 9);     // 1g lipide = 9 kcal
+      const glucides = Math.round(glucideCalories / 4);  // 1g glucide = 4 kcal
       
       return { proteines, lipides, glucides };
     } else {
