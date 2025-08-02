@@ -450,10 +450,21 @@ const Dashboard = forwardRef<DashboardRef, DashboardProps>(({ onOpenProfile }, r
 
   /**
    * Calculates the date range for the current week (Monday to Sunday)
+   * For Sunday, shows the week that ENDS on that Sunday
    */
   const getWeekDateRange = (currentDate: Date) => {
     const startOfWeek = new Date(currentDate);
-    startOfWeek.setDate(currentDate.getDate() - currentDate.getDay() + 1);
+    
+    // If it's Sunday (day 0), we want the week that ends TODAY
+    // If it's any other day, we want the week that contains today
+    if (currentDate.getDay() === 0) {
+      // Sunday: go back 6 days to get Monday
+      startOfWeek.setDate(currentDate.getDate() - 6);
+    } else {
+      // Monday-Saturday: calculate normally
+      startOfWeek.setDate(currentDate.getDate() - currentDate.getDay() + 1);
+    }
+    
     const endOfWeek = new Date(startOfWeek);
     endOfWeek.setDate(startOfWeek.getDate() + 6);
     return { startOfWeek, endOfWeek };
@@ -524,6 +535,9 @@ const Dashboard = forwardRef<DashboardRef, DashboardProps>(({ onOpenProfile }, r
   // Real data calculation for weekly summary
   const getWeeklySummaryData = () => {
     const { startOfWeek, endOfWeek } = getWeekDateRange(currentDate);
+    
+    console.log(`🗓️ Current date: ${currentDate.toISOString().split('T')[0]}`);
+    console.log(`📅 Week range: ${startOfWeek.toISOString().split('T')[0]} to ${endOfWeek.toISOString().split('T')[0]}`);
     
     // Initialize totals
     const totals: WeeklyTotals = {
