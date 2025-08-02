@@ -7,13 +7,14 @@ import { parseLocalFloat } from '../utils/numberUtils';
 interface UserProfileProps {
   readonly isOpen: boolean;
   readonly onClose: () => void;
+  readonly onProfileChange?: () => void;
 }
 
 /**
  * Composant de gestion du profil utilisateur
  * Permet de saisir les informations personnelles et calcule automatiquement les macros
  */
-export default function UserProfile({ isOpen, onClose }: UserProfileProps) {
+export default function UserProfile({ isOpen, onClose, onProfileChange }: UserProfileProps) {
   const [profile, setProfile] = useState<UserProfileType | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -93,6 +94,10 @@ export default function UserProfile({ isOpen, onClose }: UserProfileProps) {
       const savedProfile = await userProfileService.createOrUpdateProfile(formData);
       setProfile(savedProfile);
       setIsEditing(false);
+      // Notify parent component of profile change
+      if (onProfileChange) {
+        onProfileChange();
+      }
     } catch (error) {
       console.error('Erreur lors de la sauvegarde:', error);
       setErrors({ submit: 'Erreur lors de la sauvegarde' });
@@ -110,6 +115,10 @@ export default function UserProfile({ isOpen, onClose }: UserProfileProps) {
         await userProfileService.deleteUserProfile();
         setProfile(null);
         setIsEditing(true);
+        // Notify parent component of profile change
+        if (onProfileChange) {
+          onProfileChange();
+        }
       } catch (error) {
         console.error('Erreur lors de la suppression:', error);
         setErrors({ submit: 'Erreur lors de la suppression' });
@@ -184,7 +193,7 @@ export default function UserProfile({ isOpen, onClose }: UserProfileProps) {
                   <span className="text-sm text-gray-600">Type de régime</span>
                   <p className="font-semibold">
                     {profile.regime_type === 'proteine_glucides_reduits' 
-                      ? 'Protéiné / Glucides réduits (Sèche musculaire)' 
+                      ? 'High Protein Low Carb (40/40/20)' 
                       : 'Standard (Équilibré)'
                     }
                   </p>
@@ -243,18 +252,18 @@ export default function UserProfile({ isOpen, onClose }: UserProfileProps) {
                   </div>
                 </div>
                 
-                {/* Détail du calcul pour régime protéiné/glucides réduits */}
+                {/* Détail du calcul pour régime High Protein Low Carb */}
                 {profile.regime_type === 'proteine_glucides_reduits' && (
                   <div className="mt-4 p-3 bg-white rounded border-l-4 border-purple-500">
                     <h4 className="text-sm font-semibold text-purple-900 mb-2">
-                      📊 Détail du calcul "Protéiné / Glucides réduits"
+                      📊 Détail du calcul "High Protein Low Carb"
                     </h4>
                     <div className="text-xs text-gray-600 space-y-1">
-                      <div>🧬 Protéines : 2.5g/kg × {profile.poids}kg = {profile.macros_cibles.proteines}g ({profile.macros_cibles.proteines * 4} kcal)</div>
-                      <div>🧈 Lipides : 1.1g/kg × {profile.poids}kg = {profile.macros_cibles.lipides}g ({profile.macros_cibles.lipides * 9} kcal)</div>
-                      <div>🍚 Glucides : Reste = {profile.macros_cibles.glucides}g ({profile.macros_cibles.glucides * 4} kcal)</div>
+                      <div>🧬 Protéines : 40% des calories = {profile.macros_cibles.proteines}g ({profile.macros_cibles.proteines * 4} kcal)</div>
+                      <div>🧈 Lipides : 40% des calories = {profile.macros_cibles.lipides}g ({profile.macros_cibles.lipides * 9} kcal)</div>
+                      <div>🍚 Glucides : 20% des calories = {profile.macros_cibles.glucides}g ({profile.macros_cibles.glucides * 4} kcal)</div>
                       <div className="pt-1 text-purple-700 font-medium">
-                        ✨ Idéal pour : Sèche musculaire, recomposition corporelle, "low carb high protein"
+                        ✨ Idéal pour : Sèche musculaire, recomposition corporelle, régime cétogène modéré
                       </div>
                     </div>
                   </div>
@@ -411,7 +420,7 @@ export default function UserProfile({ isOpen, onClose }: UserProfileProps) {
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                     >
                       <option value="standard">Standard - Équilibré (2g/kg protéines, 1g/kg lipides, ~50% glucides)</option>
-                      <option value="proteine_glucides_reduits">Protéiné / Glucides réduits (2.5g/kg protéines, max 75g glucides, 45-55% lipides)</option>
+                      <option value="proteine_glucides_reduits">High Protein Low Carb (40% protéines, 40% lipides, 20% glucides)</option>
                     </select>
                     <p className="text-xs text-gray-500 mt-1">
                       {formData.regime_type === 'proteine_glucides_reduits' 
@@ -422,14 +431,14 @@ export default function UserProfile({ isOpen, onClose }: UserProfileProps) {
                     {formData.regime_type === 'proteine_glucides_reduits' && (
                       <div className="mt-3 p-3 bg-purple-50 rounded border">
                         <h4 className="text-xs font-semibold text-purple-900 mb-2">
-                          ⚙️ Paramètres nutritionnels "Protéiné / Glucides réduits"
+                          ⚙️ Paramètres nutritionnels "High Protein Low Carb"
                         </h4>
                         <div className="text-xs text-gray-600 space-y-1">
-                          <div>🧬 <strong>Protéines :</strong> 2.5g/kg de poids corporel</div>
-                          <div>🧈 <strong>Lipides :</strong> 1.1g/kg de poids corporel</div>
-                          <div>🍚 <strong>Glucides :</strong> Reste des calories (généralement &lt; 150g/jour)</div>
+                          <div>🧬 <strong>Protéines :</strong> 40% des calories totales</div>
+                          <div>🧈 <strong>Lipides :</strong> 40% des calories totales</div>
+                          <div>🍚 <strong>Glucides :</strong> 20% des calories totales</div>
                           <div className="pt-1 text-purple-700">
-                            <strong>✨ Idéal pour :</strong> Sèche musculaire, recomposition corporelle, régime "low carb high protein"
+                            <strong>✨ Idéal pour :</strong> Sèche musculaire, recomposition corporelle, régime cétogène modéré
                           </div>
                         </div>
                       </div>
