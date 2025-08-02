@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight, Trophy } from 'lucide-react';
 import { generateDayProtocol } from '../utils/protocolGenerator';
 import { getDayProgress, saveDayProgress, updateSelectedMeals, updateSelectedActivity } from '../utils/storage';
 import { DayProtocol, DayProgress, Meal, UserProfile } from '../types';
-import { PLATS, COLLATIONS, COMPLEMENTS_MACROS } from '../data/protocol';
+import { PLATS, COLLATIONS, COMPLEMENTS_MACROS, PETIT_DEJEUNER } from '../data/protocol';
 import { userProfileService } from '../services/userProfileService';
 import MacroCard from './MacroCard';
 import MealCard from './MealCard';
@@ -228,8 +228,8 @@ export default function Dashboard({ onOpenProfile }: DashboardProps) {
     if (mealType === 'colation') {
       staticMeals = { ...COLLATIONS };
     } else if (mealType === 'petitDejeuner') {
-      // Pour les petits déjeuners, on peut utiliser PLATS ou créer une section spécifique
-      staticMeals = { ...PLATS };
+      // Pour les petits déjeuners, utilise le petit déjeuner standard
+      staticMeals = { 'petit_dejeuner_standard': PETIT_DEJEUNER };
     } else {
       staticMeals = { ...PLATS };
     }
