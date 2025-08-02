@@ -97,10 +97,7 @@ export default function Login() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-r from-purple-500 to-pink-500 relative flex items-center justify-center p-4">
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-r from-red-400 via-yellow-400 via-green-400 via-blue-400 via-indigo-400 to-purple-400 opacity-20 animate-pulse"></div>
-          {generateSparklingDots()}
-        </div>
+        {renderBackgroundEffect()}
         <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md text-center relative z-10">
           <Loader className="h-8 w-8 animate-spin text-purple-600 mx-auto mb-4" />
           <p className="text-gray-600">Chargement...</p>
@@ -111,10 +108,7 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-purple-500 to-pink-500 relative flex items-center justify-center p-4">
-      <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-r from-red-400 via-yellow-400 via-green-400 via-blue-400 via-indigo-400 to-purple-400 opacity-20 animate-pulse"></div>
-        {generateSparklingDots()}
-      </div>
+      {renderBackgroundEffect()}
       <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md relative z-10">
         <div className="text-center mb-8">
           <div className="w-20 h-20 mx-auto mb-4 rounded-full overflow-hidden border-4 border-emerald-100 shadow-lg">
