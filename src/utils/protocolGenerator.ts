@@ -1,14 +1,21 @@
-import { DayProtocol } from '../types';
+import { DayProtocol, Meal } from '../types';
 import { PLATS, PLAT_NAMES, ACTIVITES, PETIT_DEJEUNER, COLLATIONS, CLEAR_WHEY, COMPLEMENTS } from '../data/protocol';
+import { Recipe } from '../services/recipeStorage';
 
 /**
  * Generates a complete daily protocol with meals, supplements, and activity
  * @param {Date} date - The date to generate the protocol for
  * @param {object} customMeals - Optional custom meal selections
  * @param {string} customActivity - Optional custom activity selection
+ * @param {Recipe[]} customRecipes - Optional array of custom recipes to include
  * @returns {DayProtocol} Complete protocol for the specified date
  */
-export function generateDayProtocol(date: Date, customMeals?: { dejeuner?: string; diner?: string; colation?: string }, customActivity?: string): DayProtocol {
+export function generateDayProtocol(
+  date: Date, 
+  customMeals?: { dejeuner?: string; diner?: string; colation?: string }, 
+  customActivity?: string,
+  customRecipes: Recipe[] = []
+): DayProtocol {
   const startDate = new Date(2025, 8, 1);
   const daysDiff = Math.floor((date.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
   
@@ -18,10 +25,47 @@ export function generateDayProtocol(date: Date, customMeals?: { dejeuner?: strin
   const dejeunerKey = customMeals?.dejeuner || defaultDejeunerKey;
   const dinerKey = customMeals?.diner || defaultDinerKey;
   const colationKey = customMeals?.colation || 'Fruit + amandes';
+
+  /**
+   * Gets a meal by key, checking both static meals and custom recipes
+   * @param {string} key - Meal key or recipe ID
+   * @param {'dejeuner' | 'diner' | 'colation'} type - Meal type for fallback
+   * @returns {Meal} The meal object
+   */
+  const getMealByKey = (key: string, type: 'dejeuner' | 'diner' | 'colation'): Meal => {
+    // First check if it's a static meal
+    if (type === 'colation' && COLLATIONS[key]) {
+      return COLLATIONS[key];
+    } else if (type !== 'colation' && PLATS[key]) {
+      return PLATS[key];
+    }
+    
+    // Then check custom recipes
+    const customRecipe = customRecipes.find(recipe => recipe.id === key);
+    if (customRecipe) {
+      return {
+        name: customRecipe.name,
+        kcal: customRecipe.kcal,
+        P: customRecipe.P,
+        L: customRecipe.L,
+        G: customRecipe.G,
+        ingredients: customRecipe.ingredients.map(ing => 
+          `${ing.name} ${ing.quantity}${ing.unit}`
+        ).join(' + ')
+      };
+    }
+    
+    // Fallback to default static meal
+    if (type === 'colation') {
+      return COLLATIONS['Fruit + amandes'] || Object.values(COLLATIONS)[0];
+    } else {
+      return PLATS[defaultDejeunerKey] || Object.values(PLATS)[0];
+    }
+  };
   
-  const dejeunerPlat = PLATS[dejeunerKey];
-  const dinerPlat = PLATS[dinerKey];
-  const colationPlat = COLLATIONS[colationKey];
+  const dejeunerPlat = getMealByKey(dejeunerKey, 'dejeuner');
+  const dinerPlat = getMealByKey(dinerKey, 'diner');
+  const colationPlat = getMealByKey(colationKey, 'colation');
   
   const sport = customActivity || ACTIVITES[Math.abs(daysDiff) % ACTIVITES.length];
   
