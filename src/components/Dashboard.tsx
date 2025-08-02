@@ -17,6 +17,7 @@ import WeeklySummary from './WeeklySummary';
 import RecipeManager from './RecipeManager';
 import { useRecipes } from '../hooks/useRecipes';
 import { Recipe } from '../services/recipeStorage';
+import logoImage from '../assets/e-protocol-logo.jpg';
 
 /**
  * Type definition for meal types in the protocol
@@ -599,6 +600,44 @@ const Dashboard = forwardRef<DashboardRef, DashboardProps>(({ onOpenProfile }, r
 
   const actualMacros = calculateActualMacros();
 
+  /**
+   * Renders modern animated logo bubble
+   * @returns {JSX.Element} Logo bubble component
+   */
+  const renderLogoBubble = () => (
+    <div className="flex justify-center py-4 bg-gradient-to-r from-gray-50 to-blue-50">
+      <div className="relative group">
+        {/* Bulle principale */}
+        <div className="relative w-20 h-20 bg-white rounded-full shadow-lg border-4 border-emerald-100 overflow-hidden transform transition-all duration-500 group-hover:scale-110 group-hover:shadow-xl">
+          <img 
+            src={logoImage} 
+            alt="E-Protocol Logo" 
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          />
+          
+          {/* Effet de glow au hover */}
+          <div className="absolute inset-0 bg-gradient-to-r from-emerald-400/20 to-blue-400/20 opacity-0 transition-opacity duration-500 group-hover:opacity-100"></div>
+        </div>
+        
+        {/* Cercles d'animation autour */}
+        <div className="absolute inset-0 rounded-full border-2 border-emerald-300/30 animate-ping"></div>
+        <div className="absolute inset-0 rounded-full border border-blue-300/20 animate-pulse"></div>
+        
+        {/* Particules flottantes */}
+        <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-400 rounded-full animate-bounce"></div>
+        <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{animationDelay: '0.5s'}}></div>
+        <div className="absolute top-1/2 -right-2 w-1.5 h-1.5 bg-purple-400 rounded-full animate-pulse" style={{animationDelay: '1s'}}></div>
+        
+        {/* Texte au hover */}
+        <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div className="bg-gray-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+            E-Protocol Dashboard
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Date Navigation */}
@@ -632,6 +671,9 @@ const Dashboard = forwardRef<DashboardRef, DashboardProps>(({ onOpenProfile }, r
           </button>
         </div>
       </div>
+
+      {/* Logo Bubble moderne */}
+      {renderLogoBubble()}
 
       <div className="p-4 space-y-6">
         {/* Weekly summary button (displayed only on Sundays) */}
