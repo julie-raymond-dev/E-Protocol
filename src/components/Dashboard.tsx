@@ -452,6 +452,7 @@ export default function Dashboard() {
           <h2 className="text-lg font-semibold text-gray-900">Repas du jour</h2>
           
           <MealCard
+            key={`petit-dejeuner-${progress.petitDejeuner}`}
             meal={protocol.petitDejeuner}
             completed={progress.petitDejeuner}
             onToggle={() => updateProgress({ petitDejeuner: !progress.petitDejeuner })}
@@ -460,6 +461,7 @@ export default function Dashboard() {
           />
           
           <MealCard
+            key={`dejeuner-${progress.dejeuner}`}
             meal={protocol.dejeuner}
             completed={progress.dejeuner}
             onToggle={() => updateProgress({ dejeuner: !progress.dejeuner })}
@@ -468,6 +470,7 @@ export default function Dashboard() {
           />
           
           <MealCard
+            key={`diner-${progress.diner}`}
             meal={protocol.diner}
             completed={progress.diner}
             onToggle={() => updateProgress({ diner: !progress.diner })}
@@ -476,6 +479,7 @@ export default function Dashboard() {
           />
           
           <MealCard
+            key={`colation-${progress.colation}`}
             meal={protocol.colation}
             completed={progress.colation}
             onToggle={() => updateProgress({ colation: !progress.colation })}
@@ -484,6 +488,7 @@ export default function Dashboard() {
           />
           
           <MealCard
+            key={`clear-whey-${progress.clearWhey}`}
             meal={protocol.clearWhey}
             completed={progress.clearWhey}
             onToggle={() => updateProgress({ clearWhey: !progress.clearWhey })}
