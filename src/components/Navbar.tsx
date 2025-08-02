@@ -4,9 +4,11 @@ import { useState } from 'react';
 
 /**
  * Navigation bar component with user authentication and menu actions
+ * @param {Object} props - Component props
+ * @param {Function} props.onOpenProfile - Function to open user profile
  * @returns {JSX.Element} Navbar component with logout, navigation, and menu functionality
  */
-export default function Navbar() {
+export default function Navbar({ onOpenProfile }: { readonly onOpenProfile: () => void }) {
   const { logout, user } = useAuth0();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -102,11 +104,24 @@ export default function Navbar() {
         isMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
       }`}>
         <div className="max-w-7xl mx-auto px-4 py-4 space-y-3">
-          {/* Utilisateur info */}
-          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-            <User className="h-5 w-5 text-gray-600" />
-            <span className="text-sm font-medium text-gray-900">{user?.name || user?.email}</span>
-          </div>
+          {/* Bouton Profil Utilisateur */}
+          <button
+            onClick={() => {
+              onOpenProfile();
+              setIsMenuOpen(false);
+            }}
+            className="w-full flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-purple-50 transition-colors group"
+          >
+            <User className="h-5 w-5 text-purple-600" />
+            <div className="flex-1 text-left">
+              <div className="text-sm font-medium text-gray-900 group-hover:text-purple-700">
+                {user?.name || user?.email}
+              </div>
+              <div className="text-xs text-gray-500 group-hover:text-purple-600">
+                Voir mon profil
+              </div>
+            </div>
+          </button>
           
           {/* Bouton Mes Recettes */}
           <button
