@@ -25,14 +25,15 @@ export default function MacroCard({ label, value, objective, unit, color }: Macr
   // Handle cases where objective is 0 (no profile set)
   const hasObjective = objective > 0;
   const percentage = hasObjective ? roundTo((value / objective) * 100, 1) : 0;
-  const isComplete = hasObjective && percentage >= 100;
   const hasProgress = value > 0;
 
-  // Determine badge styling
+  // Determine badge styling based on percentage
   let badgeClasses = 'text-xs px-2 py-1 rounded-full ';
   if (!hasObjective) {
     badgeClasses += 'bg-gray-100 text-gray-400';
-  } else if (isComplete) {
+  } else if (percentage > 100) {
+    badgeClasses += 'bg-red-100 text-red-700';
+  } else if (percentage === 100) {
     badgeClasses += 'bg-emerald-100 text-emerald-700';
   } else {
     badgeClasses += 'bg-gray-200 text-gray-600';
@@ -59,7 +60,13 @@ export default function MacroCard({ label, value, objective, unit, color }: Macr
       <div className="w-full bg-gray-200 rounded-full h-2">
         <div
           className={`h-2 rounded-full transition-all duration-300 ${
-            hasProgress && hasObjective ? color : 'bg-gray-300'
+            !hasProgress || !hasObjective 
+              ? 'bg-gray-300'
+              : percentage > 100
+                ? 'bg-red-500'
+                : percentage === 100
+                  ? 'bg-emerald-500'
+                  : color
           }`}
           style={{ 
             width: hasObjective && hasProgress ? `${Math.min(percentage, 100)}%` : '0%' 
