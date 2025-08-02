@@ -24,10 +24,34 @@ interface MealCardProps {
  * @returns {JSX.Element} Meal card component
  */
 export default function MealCard({ meal, completed, onToggle, canChange, onChangeClick }: MealCardProps) {
+  // Handle click on the card (but not on specific buttons)
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Don't trigger if clicking on buttons
+    if ((e.target as HTMLElement).closest('button')) {
+      return;
+    }
+    onToggle();
+  };
+
+  // Handle keyboard interaction
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onToggle();
+    }
+  };
+
   return (
-    <div className={`bg-white rounded-xl p-4 border-2 transition-all duration-200 ${
-      completed ? 'border-emerald-200 bg-emerald-50' : 'border-gray-200 hover:border-emerald-200'
-    }`}>
+    <button 
+      type="button"
+      className={`w-full text-left bg-white rounded-xl p-4 border-2 transition-all duration-200 cursor-pointer ${
+        completed ? 'border-emerald-200 bg-emerald-50' : 'border-gray-200 hover:border-emerald-200'
+      }`}
+      onClick={handleCardClick}
+      onKeyDown={handleKeyDown}
+      aria-pressed={completed}
+      aria-label={`${completed ? 'Décocher' : 'Cocher'} le repas ${meal.name}`}
+    >
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1">
           <div className="flex items-center gap-2">
@@ -76,6 +100,6 @@ export default function MealCard({ meal, completed, onToggle, canChange, onChang
           <div className="text-xs text-gray-500">G</div>
         </div>
       </div>
-    </div>
+    </button>
   );
 }

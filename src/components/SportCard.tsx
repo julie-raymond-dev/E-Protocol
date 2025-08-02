@@ -40,10 +40,35 @@ export default function SportCard({ activity, completed, onToggle, onChangeClick
   };
 
   const { calories, metValue } = getCaloriesInfo();
+  
+  // Handle click on the card (but not on specific buttons)
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Don't trigger if clicking on buttons
+    if ((e.target as HTMLElement).closest('button')) {
+      return;
+    }
+    onToggle();
+  };
+
+  // Handle keyboard interaction
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onToggle();
+    }
+  };
+  
   return (
-    <div className={`bg-white rounded-xl p-4 border-2 transition-all duration-200 ${
-      completed ? 'border-emerald-200 bg-emerald-50' : 'border-gray-200 hover:border-emerald-200'
-    }`}>
+    <button 
+      type="button"
+      className={`w-full text-left bg-white rounded-xl p-4 border-2 transition-all duration-200 cursor-pointer ${
+        completed ? 'border-emerald-200 bg-emerald-50' : 'border-gray-200 hover:border-emerald-200'
+      }`}
+      onClick={handleCardClick}
+      onKeyDown={handleKeyDown}
+      aria-pressed={completed}
+      aria-label={`${completed ? 'Décocher' : 'Cocher'} l'activité ${activity}`}
+    >
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-3">
           <div className={`p-2 rounded-full ${
@@ -87,6 +112,6 @@ export default function SportCard({ activity, completed, onToggle, onChangeClick
           <Check className="h-5 w-5" />
         </button>
       </div>
-    </div>
+    </button>
   );
 }
