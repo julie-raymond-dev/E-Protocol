@@ -8,6 +8,7 @@ import RecipeForm from './RecipeForm';
 interface RecipeManagerProps {
   readonly isOpen: boolean;
   readonly onClose: () => void;
+  readonly defaultMealType?: Recipe['type'];
 }
 
 /**
@@ -15,7 +16,7 @@ interface RecipeManagerProps {
  * @param {RecipeManagerProps} props - Component props containing open state and close handler
  * @returns {JSX.Element | null} The recipe management interface or null if closed
  */
-export default function RecipeManager({ isOpen, onClose }: RecipeManagerProps) {
+export default function RecipeManager({ isOpen, onClose, defaultMealType }: RecipeManagerProps) {
   const { 
     recipes, 
     isLoading, 
@@ -102,6 +103,7 @@ export default function RecipeManager({ isOpen, onClose }: RecipeManagerProps) {
         isOpen={true}
         onClose={handleFormClose}
         editingRecipe={editingRecipe}
+        defaultMealType={defaultMealType}
       />
     );
   }
