@@ -1,4 +1,8 @@
-import { X, Check, Dumbbell } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X, Dumbbell, Check } from 'lucide-react';
+import { ACTIVITIES_BY_CATEGORY, calculateCaloriesBurned, getActivityMet } from '../data/activities-met';
+import { userProfileService } from '../services/userProfileService';
+import { UserProfile } from '../types';
 
 interface ActivitySelectorProps {
   readonly isOpen: boolean;
@@ -13,27 +17,42 @@ export default function ActivitySelector({
   selectedActivity, 
   onSelectActivity 
 }: ActivitySelectorProps) {
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+
+  useEffect(() => {
+    const loadUserProfile = async () => {
+      try {
+        const profile = await userProfileService.getUserProfile();
+        setUserProfile(profile);
+      } catch (error) {
+        console.error('Erreur lors du chargement du profil:', error);
+      }
+    };
+
+    if (isOpen) {
+      loadUserProfile();
+    }
+  }, [isOpen]);
+
+  // Get calories info for an activity
+  const getCaloriesInfo = (activity: string) => {
+    const met = getActivityMet(activity);
+    if (!met) return { calories: 0, metValue: 0 };
+
+    // Use user weight if available, otherwise default to 60kg
+    const weight = userProfile?.poids || 60;
+    const calories = calculateCaloriesBurned(activity, weight, 45);
+    
+    return { calories, metValue: met };
+  };
+
   if (!isOpen) return null;
 
   const categorizeActivities = () => {
-    const categories = {
-      'Cours collectifs fitness': [
-        'Bodybalance', 'Pilates', 'Stretching', 'Swiss Ball', 'Yoga',
-        'Cardio Combat', 'Step', 'Step Débutant', 'Step Intermédiaire', 'LIA',
-        'Bodypump', 'Body Sculpt', 'Cuisses Abdos Fessiers', 'RPM', 'Zumba',
-        'Hyrox', 'HBX Boxing', 'HBX Fusion', 'HBX Move'
-      ],
-      'Accès libre': [
-        'Cardio-musculation', 'Escalade', 'Golf', 'Squash'
-      ],
-      'Options personnelles': [
-        'Repos actif', 'Marche', 'Étirements libres'
-      ]
-    };
-
-    return Object.entries(categories).map(([category, categoryActivities]) => ({
+    // Use our MET-based categorization
+    return Object.entries(ACTIVITIES_BY_CATEGORY).map(([category, activities]) => ({
       category,
-      activities: categoryActivities
+      activities: activities.map(activity => activity.name)
     }));
   };
 
@@ -83,7 +102,12 @@ export default function ActivitySelector({
                         </div>
                         <div>
                           <h4 className="font-medium text-gray-900">{activity}</h4>
-                          <p className="text-sm text-gray-600">UCPA Sport Station</p>
+                          <p className="text-sm text-gray-600">
+                            {getCaloriesInfo(activity).calories > 0 
+                              ? `~${Math.round(getCaloriesInfo(activity).calories)} kcal (45 min)`
+                              : "Calories à calculer"
+                            }
+                          </p>
                         </div>
                       </div>
                       {selectedActivity === activity && (
