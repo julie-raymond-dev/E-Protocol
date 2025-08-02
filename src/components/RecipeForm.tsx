@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { X, Plus, Trash2, Calculator } from 'lucide-react';
 import { Recipe, Ingredient } from '../services/recipeStorage';
 import { useRecipes } from '../hooks/useRecipes';
+import { parseLocalFloat, roundTo } from '../utils/numberUtils';
 
 interface RecipeFormProps {
   readonly isOpen: boolean;
@@ -192,9 +193,9 @@ export default function RecipeForm({ isOpen, onClose, editingRecipe }: RecipeFor
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl w-full max-w-4xl h-[90vh] flex flex-col">
+      <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between flex-shrink-0">
+        <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between flex-shrink-0 rounded-t-2xl">
           <h2 className="text-xl font-bold text-gray-900">
             {editingRecipe ? 'Modifier la recette' : 'Nouvelle recette'}
           </h2>
@@ -206,9 +207,9 @@ export default function RecipeForm({ isOpen, onClose, editingRecipe }: RecipeFor
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex-1 flex flex-col">
+        <form onSubmit={handleSubmit} className="flex-1 flex flex-col min-h-0">
           {/* Contenu */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          <div className="flex-1 overflow-y-auto p-6 space-y-6 min-h-0">
             {/* Informations de base */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-gray-900">Informations générales</h3>
@@ -293,19 +294,19 @@ export default function RecipeForm({ isOpen, onClose, editingRecipe }: RecipeFor
 
               <div className="grid grid-cols-4 gap-4">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-orange-600">{Math.round(totalMacros.kcal)}</div>
+                  <div className="text-2xl font-bold text-orange-600">{roundTo(totalMacros.kcal, 0)}</div>
                   <div className="text-sm text-gray-500">kcal</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-emerald-600">{Math.round(totalMacros.P)}g</div>
+                  <div className="text-2xl font-bold text-emerald-600">{roundTo(totalMacros.P, 1)}g</div>
                   <div className="text-sm text-gray-500">Protéines</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600">{Math.round(totalMacros.L)}g</div>
+                  <div className="text-2xl font-bold text-blue-600">{roundTo(totalMacros.L, 1)}g</div>
                   <div className="text-sm text-gray-500">Lipides</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-purple-600">{Math.round(totalMacros.G)}g</div>
+                  <div className="text-2xl font-bold text-purple-600">{roundTo(totalMacros.G, 1)}g</div>
                   <div className="text-sm text-gray-500">Glucides</div>
                 </div>
               </div>
@@ -313,7 +314,7 @@ export default function RecipeForm({ isOpen, onClose, editingRecipe }: RecipeFor
           </div>
 
           {/* Footer */}
-          <div className="border-t px-6 py-4 flex justify-end gap-3 flex-shrink-0">
+          <div className="border-t px-6 py-4 flex justify-end gap-3 flex-shrink-0 bg-white rounded-b-2xl">
             {errors.submit && (
               <p className="text-sm text-red-600 mr-auto self-center">{errors.submit}</p>
             )}
@@ -401,7 +402,7 @@ function IngredientForm({ ingredient, onUpdate, onRemove, canRemove }: Ingredien
             id={`ingredient-quantity-${ingredient.tempId}`}
             type="number"
             value={ingredient.quantity || ''}
-            onChange={(e) => onUpdate({ quantity: parseFloat(e.target.value) || 0 })}
+            onChange={(e) => onUpdate({ quantity: parseLocalFloat(e.target.value) })}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
             placeholder="100"
             min="0"
@@ -442,7 +443,7 @@ function IngredientForm({ ingredient, onUpdate, onRemove, canRemove }: Ingredien
               type="number"
               value={ingredient.macros.kcal || ''}
               onChange={(e) => onUpdate({ 
-                macros: { ...ingredient.macros, kcal: parseFloat(e.target.value) || 0 }
+                macros: { ...ingredient.macros, kcal: parseLocalFloat(e.target.value) }
               })}
               className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
               placeholder="0"
@@ -457,7 +458,7 @@ function IngredientForm({ ingredient, onUpdate, onRemove, canRemove }: Ingredien
               type="number"
               value={ingredient.macros.P || ''}
               onChange={(e) => onUpdate({ 
-                macros: { ...ingredient.macros, P: parseFloat(e.target.value) || 0 }
+                macros: { ...ingredient.macros, P: parseLocalFloat(e.target.value) }
               })}
               className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
               placeholder="0"
@@ -472,7 +473,7 @@ function IngredientForm({ ingredient, onUpdate, onRemove, canRemove }: Ingredien
               type="number"
               value={ingredient.macros.L || ''}
               onChange={(e) => onUpdate({ 
-                macros: { ...ingredient.macros, L: parseFloat(e.target.value) || 0 }
+                macros: { ...ingredient.macros, L: parseLocalFloat(e.target.value) }
               })}
               className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
               placeholder="0"
@@ -487,7 +488,7 @@ function IngredientForm({ ingredient, onUpdate, onRemove, canRemove }: Ingredien
               type="number"
               value={ingredient.macros.G || ''}
               onChange={(e) => onUpdate({ 
-                macros: { ...ingredient.macros, G: parseFloat(e.target.value) || 0 }
+                macros: { ...ingredient.macros, G: parseLocalFloat(e.target.value) }
               })}
               className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
               placeholder="0"
