@@ -1,0 +1,82 @@
+name: 🔒 Security Audit
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Exécuter chaque dimanche à 2h du matin
+    - cron: '0 2 * * 0'
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  security-audit:
+    name: 🛡️ Security Audit
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci --audit --fund=false
+
+      - name: 🔍 Run npm audit
+        run: |
+          echo "🔍 Checking for vulnerabilities..."
+          npm audit --audit-level=moderate
+          
+      - name: 🛡️ Run npm audit fix
+        run: |
+          echo "🔧 Attempting to fix vulnerabilities..."
+          npm audit fix --dry-run
+
+      - name: 📊 Generate security report
+        run: |
+          echo "📊 Generating security report..."
+          npm audit --json > security-report.json || true
+          
+      - name: 📤 Upload security report
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-report
+          path: security-report.json
+          retention-days: 30
+
+  dependency-check:
+    name: 🔍 Dependency Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🔍 Check for outdated packages
+        run: |
+          echo "🔍 Checking for outdated packages..."
+          npm outdated || true
+          
+      - name: 🛡️ License check
+        run: |
+          echo "📜 Checking package licenses..."
+          npx license-checker --summary || true
