@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Trophy } from 'lucide-react';
 import { generateDayProtocol } from '../utils/protocolGenerator';
 import { getDayProgress, saveDayProgress, updateSelectedMeals, updateSelectedActivity } from '../utils/storage';
-import { DayProtocol, DayProgress } from '../types';
+import { DayProtocol, DayProgress, Meal } from '../types';
 import { OBJECTIVES, PLATS, COLLATIONS, COMPLEMENTS_MACROS } from '../data/protocol';
 import MacroCard from './MacroCard';
 import MealCard from './MealCard';
@@ -18,12 +18,14 @@ import MealSelector from './MealSelector';
 import ActivitySelector from './ActivitySelector';
 import WeeklySummary from './WeeklySummary';
 import RecipeManager from './RecipeManager';
+import { useRecipes } from '../hooks/useRecipes';
 
 /**
  * Main dashboard component for displaying daily nutrition protocol and progress tracking
  * @returns {JSX.Element} Dashboard component with meal cards, activity tracking, and progress monitoring
  */
 export default function Dashboard() {
+  const { recipes } = useRecipes();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [protocol, setProtocol] = useState<DayProtocol>();
   const [progress, setProgress] = useState<DayProgress>();
@@ -40,7 +42,7 @@ export default function Dashboard() {
     const customMeals = existingProgress?.selectedMeals;
     const customActivity = existingProgress?.selectedActivity;
     
-    const dayProtocol = generateDayProtocol(currentDate, customMeals, customActivity);
+    const dayProtocol = generateDayProtocol(currentDate, customMeals, customActivity, recipes);
     setProtocol(dayProtocol);
 
     if (existingProgress) {
@@ -59,7 +61,7 @@ export default function Dashboard() {
       };
       setProgress(newProgress);
     }
-  }, [currentDate]);
+  }, [currentDate, recipes]);
 
   // Set up event listeners for navigation and recipe management
   useEffect(() => {
@@ -110,7 +112,7 @@ export default function Dashboard() {
     updateSelectedMeals(protocol.date, selectedMeals);
     
     // Regenerate protocol with the new meal
-    const newProtocol = generateDayProtocol(currentDate, selectedMeals);
+    const newProtocol = generateDayProtocol(currentDate, selectedMeals, undefined, recipes);
     setProtocol(newProtocol);
     
     // Update progress with new selections
@@ -127,7 +129,7 @@ export default function Dashboard() {
     updateSelectedActivity(protocol.date, activity);
     
     // Regenerate protocol with the new activity
-    const newProtocol = generateDayProtocol(currentDate, progress.selectedMeals, activity);
+    const newProtocol = generateDayProtocol(currentDate, progress.selectedMeals, activity, recipes);
     setProtocol(newProtocol);
     
     // Update progress with the new activity
@@ -178,6 +180,40 @@ export default function Dashboard() {
   if (!protocol || !progress) return null;
 
   /**
+   * Combines static meals with custom recipes by meal type
+   * @param {MealType} mealType - Type of meal to get options for
+   * @returns {Record<string, Meal>} Combined meal options
+   */
+  const getCombinedMealsForType = (mealType: MealType): Record<string, Meal> => {
+    let staticMeals: Record<string, Meal> = {};
+    
+    if (mealType === 'colation') {
+      staticMeals = { ...COLLATIONS };
+    } else {
+      staticMeals = { ...PLATS };
+    }
+
+    // Add custom recipes of the same type
+    const customRecipes: Record<string, Meal> = {};
+    recipes
+      .filter(recipe => recipe.type === mealType)
+      .forEach(recipe => {
+        customRecipes[recipe.id] = {
+          name: recipe.name,
+          kcal: recipe.kcal,
+          P: recipe.P,
+          L: recipe.L,
+          G: recipe.G,
+          ingredients: recipe.ingredients.map(ing => 
+            `${ing.name} ${ing.quantity}${ing.unit}`
+          ).join(' + ')
+        };
+      });
+
+    return { ...staticMeals, ...customRecipes };
+  };
+
+  /**
    * Gets the current meal key for a specific meal type
    * @param {MealType} mealType - Type of meal to get key for
    * @returns {string} Current meal key
@@ -188,6 +224,18 @@ export default function Dashboard() {
     }
     
     const mealName = protocol[mealType].name;
+    const allMealsForType = getCombinedMealsForType(mealType);
+    
+    // First check if it's a custom recipe
+    const customRecipeKey = Object.keys(allMealsForType).find(key => 
+      allMealsForType[key].name === mealName
+    );
+    
+    if (customRecipeKey) {
+      return customRecipeKey;
+    }
+    
+    // Fallback to static meals
     return Object.keys(PLATS).find(key => PLATS[key].name === mealName) || Object.keys(PLATS)[0];
   };
 
@@ -455,7 +503,7 @@ export default function Dashboard() {
           if (mealSelector.type === 'diner') return 'Choisir le dîner';
           return 'Choisir la collation';
         })()}
-        meals={mealSelector.type === 'colation' ? COLLATIONS : PLATS}
+        meals={mealSelector.type ? getCombinedMealsForType(mealSelector.type) : {}}
         selectedMeal={mealSelector.type ? getCurrentMealKey(mealSelector.type) : ''}
         onSelectMeal={(mealKey: string) => {
           if (mealSelector.type) {
