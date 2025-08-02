@@ -59,15 +59,16 @@ export default function SportCard({ activity, completed, onToggle, onChangeClick
   };
   
   return (
-    <button 
-      type="button"
-      className={`w-full text-left bg-white rounded-xl p-4 border-2 transition-all duration-200 cursor-pointer ${
+    <div 
+      className={`bg-white rounded-xl p-4 border-2 transition-all duration-200 cursor-pointer ${
         completed ? 'border-emerald-200 bg-emerald-50' : 'border-gray-200 hover:border-emerald-200'
       }`}
       onClick={handleCardClick}
       onKeyDown={handleKeyDown}
-      aria-pressed={completed}
-      aria-label={`${completed ? 'Décocher' : 'Cocher'} l'activité ${activity}`}
+      role="switch"
+      tabIndex={0}
+      aria-checked={completed}
+      aria-label={`${completed ? 'Désactiver' : 'Activer'} l'activité ${activity}`}
     >
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-3">
@@ -112,6 +113,6 @@ export default function SportCard({ activity, completed, onToggle, onChangeClick
           <Check className="h-5 w-5" />
         </button>
       </div>
-    </button>
+    </div>
   );
 }

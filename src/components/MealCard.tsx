@@ -42,15 +42,16 @@ export default function MealCard({ meal, completed, onToggle, canChange, onChang
   };
 
   return (
-    <button 
-      type="button"
-      className={`w-full text-left bg-white rounded-xl p-4 border-2 transition-all duration-200 cursor-pointer ${
+    <div 
+      className={`bg-white rounded-xl p-4 border-2 transition-all duration-200 cursor-pointer ${
         completed ? 'border-emerald-200 bg-emerald-50' : 'border-gray-200 hover:border-emerald-200'
       }`}
       onClick={handleCardClick}
       onKeyDown={handleKeyDown}
-      aria-pressed={completed}
-      aria-label={`${completed ? 'Décocher' : 'Cocher'} le repas ${meal.name}`}
+      role="switch"
+      tabIndex={0}
+      aria-checked={completed}
+      aria-label={`${completed ? 'Désactiver' : 'Activer'} le repas ${meal.name}`}
     >
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1">
@@ -100,6 +101,6 @@ export default function MealCard({ meal, completed, onToggle, canChange, onChang
           <div className="text-xs text-gray-500">G</div>
         </div>
       </div>
-    </button>
+    </div>
   );
 }
