@@ -2,17 +2,23 @@ import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Trophy } from 'lucide-react';
 import { generateDayProtocol } from '../utils/protocolGenerator';
 import { getDayProgress, saveDayProgress, updateSelectedMeals, updateSelectedActivity } from '../utils/storage';
-import { DayProtocol, DayProgress, Meal } from '../types';
-import { OBJECTIVES, PLATS, COLLATIONS, COMPLEMENTS_MACROS } from '../data/protocol';
+import { DayProtocol, DayProgress, Meal, UserProfile } from '../types';
+import { PLATS, COLLATIONS, COMPLEMENTS_MACROS } from '../data/protocol';
+import { userProfileService } from '../services/userProfileService';
 import MacroCard from './MacroCard';
 import MealCard from './MealCard';
 import SportCard from './SportCard';
 import ComplementsCard from './ComplementsCard';
+import ProfileBanner from './ProfileBanner';
 
 /**
  * Type definition for meal types in the protocol
  */
 type MealType = 'petitDejeuner' | 'dejeuner' | 'diner' | 'colation';
+
+interface DashboardProps {
+  readonly onOpenProfile: () => void;
+}
 
 import MealSelector from './MealSelector';
 import ActivitySelector from './ActivitySelector';
@@ -25,11 +31,13 @@ import { Recipe } from '../services/recipeStorage';
  * Main dashboard component for displaying daily nutrition protocol and progress tracking
  * @returns {JSX.Element} Dashboard component with meal cards, activity tracking, and progress monitoring
  */
-export default function Dashboard() {
+export default function Dashboard({ onOpenProfile }: DashboardProps) {
   const { recipes } = useRecipes();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [protocol, setProtocol] = useState<DayProtocol>();
   const [progress, setProgress] = useState<DayProgress>();
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [profileLoading, setProfileLoading] = useState(true);
   const [mealSelector, setMealSelector] = useState<{
     isOpen: boolean;
     type: MealType | null;
@@ -64,6 +72,24 @@ export default function Dashboard() {
       setProgress(newProgress);
     }
   }, [currentDate, recipes]);
+
+  // Load user profile
+  useEffect(() => {
+    const loadUserProfile = async () => {
+      try {
+        setProfileLoading(true);
+        const profile = await userProfileService.getUserProfile();
+        setUserProfile(profile);
+      } catch (error) {
+        console.error('Erreur lors du chargement du profil:', error);
+        setUserProfile(null);
+      } finally {
+        setProfileLoading(false);
+      }
+    };
+
+    loadUserProfile();
+  }, []);
 
   // Set up event listeners for navigation and recipe management
   useEffect(() => {
@@ -325,6 +351,28 @@ export default function Dashboard() {
     return totals;
   };
 
+  /**
+   * Gets the current nutritional objectives (from user profile or default values)
+   */
+  const getCurrentObjectives = () => {
+    if (userProfile) {
+      return {
+        KCAL: userProfile.calories_cibles,
+        P: userProfile.macros_cibles.proteines,
+        L: userProfile.macros_cibles.lipides,
+        G: userProfile.macros_cibles.glucides
+      };
+    }
+    
+    // Return zero values if no profile
+    return {
+      KCAL: 0,
+      P: 0,
+      L: 0,
+      G: 0
+    };
+  };
+
   // Check if it's Sunday to display the summary
   const isSunday = currentDate.getDay() === 0;
 
@@ -335,13 +383,15 @@ export default function Dashboard() {
     const endOfWeek = new Date(startOfWeek);
     endOfWeek.setDate(startOfWeek.getDate() + 6);
 
+    const currentObjectives = getCurrentObjectives();
+
     return {
       week: `${startOfWeek.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} - ${endOfWeek.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}`,
       objectives: {
-        calories: { achieved: 1650, target: OBJECTIVES.KCAL },
-        proteins: { achieved: 95, target: OBJECTIVES.P },
-        lipids: { achieved: 45, target: OBJECTIVES.L },
-        carbs: { achieved: 210, target: OBJECTIVES.G },
+        calories: { achieved: 1650, target: currentObjectives.KCAL },
+        proteins: { achieved: 95, target: currentObjectives.P },
+        lipids: { achieved: 45, target: currentObjectives.L },
+        carbs: { achieved: 210, target: currentObjectives.G },
       },
       activities: {
         planned: 5,
@@ -415,33 +465,38 @@ export default function Dashboard() {
           </div>
         )}
 
+        {/* Profile Banner - shown if no user profile */}
+        {!profileLoading && !userProfile && (
+          <ProfileBanner onOpenProfile={onOpenProfile} />
+        )}
+
         {/* Macros Overview */}
         <div className="grid grid-cols-2 gap-4">
           <MacroCard
             label="Calories"
             value={actualMacros.kcal}
-            objective={OBJECTIVES.KCAL}
+            objective={getCurrentObjectives().KCAL}
             unit=""
             color="bg-orange-500"
           />
           <MacroCard
             label="Protéines"
             value={actualMacros.P}
-            objective={OBJECTIVES.P}
+            objective={getCurrentObjectives().P}
             unit="g"
             color="bg-emerald-500"
           />
           <MacroCard
             label="Lipides"
             value={actualMacros.L}
-            objective={OBJECTIVES.L}
+            objective={getCurrentObjectives().L}
             unit="g"
             color="bg-blue-500"
           />
           <MacroCard
             label="Glucides"
             value={actualMacros.G}
-            objective={OBJECTIVES.G}
+            objective={getCurrentObjectives().G}
             unit="g"
             color="bg-purple-500"
           />
