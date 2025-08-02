@@ -1,5 +1,6 @@
 import { Check, ChevronDown } from 'lucide-react';
 import { Meal } from '../types';
+import { roundTo } from '../utils/numberUtils';
 
 /**
  * Props for the MealCard component
@@ -59,19 +60,19 @@ export default function MealCard({ meal, completed, onToggle, canChange, onChang
 
       <div className="grid grid-cols-4 gap-2">
         <div className="text-center">
-          <div className="text-lg font-bold text-orange-600">{meal.kcal}</div>
+          <div className="text-lg font-bold text-orange-600">{roundTo(meal.kcal, 1)}</div>
           <div className="text-xs text-gray-500">kcal</div>
         </div>
         <div className="text-center">
-          <div className="text-lg font-bold text-emerald-600">{meal.P}g</div>
+          <div className="text-lg font-bold text-emerald-600">{roundTo(meal.P, 1)}g</div>
           <div className="text-xs text-gray-500">P</div>
         </div>
         <div className="text-center">
-          <div className="text-lg font-bold text-blue-600">{meal.L}g</div>
+          <div className="text-lg font-bold text-blue-600">{roundTo(meal.L, 1)}g</div>
           <div className="text-xs text-gray-500">L</div>
         </div>
         <div className="text-center">
-          <div className="text-lg font-bold text-purple-600">{meal.G}g</div>
+          <div className="text-lg font-bold text-purple-600">{roundTo(meal.G, 1)}g</div>
           <div className="text-xs text-gray-500">G</div>
         </div>
       </div>
