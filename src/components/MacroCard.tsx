@@ -22,31 +22,48 @@ interface MacroCardProps {
  * @returns {JSX.Element} Macro card component with progress bar
  */
 export default function MacroCard({ label, value, objective, unit, color }: MacroCardProps) {
-  const percentage = roundTo((value / objective) * 100, 1);
-  const isComplete = percentage >= 100;
+  // Handle cases where objective is 0 (no profile set)
+  const hasObjective = objective > 0;
+  const percentage = hasObjective ? roundTo((value / objective) * 100, 1) : 0;
+  const isComplete = hasObjective && percentage >= 100;
+  const hasProgress = value > 0;
+
+  // Determine badge styling
+  let badgeClasses = 'text-xs px-2 py-1 rounded-full ';
+  if (!hasObjective) {
+    badgeClasses += 'bg-gray-100 text-gray-400';
+  } else if (isComplete) {
+    badgeClasses += 'bg-emerald-100 text-emerald-700';
+  } else {
+    badgeClasses += 'bg-gray-200 text-gray-600';
+  }
 
   return (
     <div className="bg-gray-50 rounded-xl p-4">
       <div className="flex items-center justify-between mb-2">
         <span className="text-sm font-medium text-gray-700">{label}</span>
-        <span className={`text-xs px-2 py-1 rounded-full ${
-          isComplete ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-200 text-gray-600'
-        }`}>
-          {percentage}%
+        <span className={badgeClasses}>
+          {hasObjective ? `${percentage}%` : '0%'}
         </span>
       </div>
       
       <div className="mb-2">
         <div className="flex items-baseline gap-1">
           <span className="text-2xl font-bold text-gray-900">{roundTo(value, 1)}</span>
-          <span className="text-sm text-gray-500">/ {roundTo(objective, 1)}{unit}</span>
+          <span className="text-sm text-gray-500">
+            / {hasObjective ? roundTo(objective, 1) : '0'}{unit}
+          </span>
         </div>
       </div>
 
       <div className="w-full bg-gray-200 rounded-full h-2">
         <div
-          className={`h-2 rounded-full transition-all duration-300 ${color}`}
-          style={{ width: `${Math.min(percentage, 100)}%` }}
+          className={`h-2 rounded-full transition-all duration-300 ${
+            hasProgress && hasObjective ? color : 'bg-gray-300'
+          }`}
+          style={{ 
+            width: hasObjective && hasProgress ? `${Math.min(percentage, 100)}%` : '0%' 
+          }}
         ></div>
       </div>
     </div>
