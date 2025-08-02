@@ -1,4 +1,4 @@
-import { X, Check } from 'lucide-react';
+import { X, Check, Plus } from 'lucide-react';
 import { Meal } from '../types';
 import { roundTo } from '../utils/numberUtils';
 
@@ -9,6 +9,8 @@ interface MealSelectorProps {
   readonly meals: Record<string, Meal>;
   readonly selectedMeal: string;
   readonly onSelectMeal: (mealKey: string) => void;
+  readonly mealType?: 'petitDejeuner' | 'dejeuner' | 'diner' | 'colation';
+  readonly onCreateNew?: () => void;
 }
 
 export default function MealSelector({ 
@@ -17,9 +19,21 @@ export default function MealSelector({
   title, 
   meals, 
   selectedMeal, 
-  onSelectMeal 
+  onSelectMeal,
+  mealType,
+  onCreateNew
 }: MealSelectorProps) {
   if (!isOpen) return null;
+
+  const getMealTypeName = (type: string) => {
+    switch (type) {
+      case 'petitDejeuner': return 'petit déjeuner';
+      case 'dejeuner': return 'déjeuner';
+      case 'diner': return 'dîner';
+      case 'colation': return 'collation';
+      default: return 'repas';
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end">
@@ -35,6 +49,24 @@ export default function MealSelector({
         </div>
         
         <div className="flex-1 overflow-y-auto p-4 space-y-3 pb-8" style={{ maxHeight: 'calc(90vh - 80px)' }}>
+          {/* Bouton pour créer un nouveau repas */}
+          {onCreateNew && mealType && (
+            <button
+              onClick={() => {
+                onCreateNew();
+                onClose();
+              }}
+              className="w-full p-4 rounded-xl border-2 border-dashed border-emerald-300 hover:border-emerald-500 hover:bg-emerald-50 transition-all duration-200 text-emerald-600 hover:text-emerald-700"
+            >
+              <div className="flex items-center justify-center gap-2">
+                <Plus className="h-5 w-5" />
+                <span className="font-medium">
+                  Créer un nouveau {getMealTypeName(mealType)}
+                </span>
+              </div>
+            </button>
+          )}
+          
           {Object.entries(meals).map(([key, meal]) => (
             <button
               key={key}
