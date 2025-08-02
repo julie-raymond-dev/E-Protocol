@@ -1,12 +1,22 @@
-import React from 'react';
 import { Check, Pill } from 'lucide-react';
 
+/**
+ * Props for the ComplementsCard component
+ */
 interface ComplementsCardProps {
-  complements: string[];
-  completedList: boolean[];
-  onToggle: (index: number) => void;
+  readonly complements: string[];
+  readonly completedList: boolean[];
+  readonly onToggle: (index: number) => void;
 }
 
+/**
+ * Complements card component displaying supplement checklist
+ * @param {ComplementsCardProps} props - Component props
+ * @param {string[]} props.complements - Array of supplement names
+ * @param {boolean[]} props.completedList - Array of completion states
+ * @param {function} props.onToggle - Callback to toggle supplement completion
+ * @returns {JSX.Element} Complements card component
+ */
 export default function ComplementsCard({ complements, completedList, onToggle }: ComplementsCardProps) {
   const completedCount = completedList.filter(Boolean).length;
   const totalCount = complements.length;
@@ -27,7 +37,7 @@ export default function ComplementsCard({ complements, completedList, onToggle }
 
       <div className="space-y-2">
         {complements.map((complement, index) => (
-          <div key={index} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50">
+          <div key={`${complement}-${index}`} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50">
             <button
               onClick={() => onToggle(index)}
               className={`p-1 rounded-full transition-all duration-200 ${
