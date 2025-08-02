@@ -601,6 +601,7 @@ const Dashboard = forwardRef<DashboardRef, DashboardProps>(({ onOpenProfile }, r
         <div className="space-y-4">
           <h2 className="text-lg font-semibold text-gray-900">Sport</h2>
           <SportCard
+            key={`sport-${progress.sport}`}
             activity={protocol.sport}
             completed={progress.sport}
             onToggle={() => updateProgress({ sport: !progress.sport })}
