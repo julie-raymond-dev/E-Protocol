@@ -3,10 +3,6 @@ name: 🚀 CI/CD Pipeline
 on:
   push:
     branches: [ main ]
-    paths-ignore:
-      - '**.md'
-      - '.gitignore'
-      - 'LICENSE'
   pull_request:
     branches: [ main ]
     types: [opened, synchronize, reopened]
