@@ -184,7 +184,7 @@ jobs:
           du -sh dist/
           
       - name: 🛡️ Setup Pages security
-        uses: actions/configure-pages@v4
+        uses: actions/configure-pages@v5
         
       - name: 📤 Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
