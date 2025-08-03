@@ -1,8 +1,6 @@
 # E-Protocol - Smart Nutrition & Fitness Tracker
 
-[![Deploy to GitHub Pages](https://github.com/julie-raymond-dev/E-Protocol/actions/workflows/deploy.yml/badge.svg)](https://github.com/julie-raymond-dev/E-Protocol/actions/workflows/deploy.yml)
-[![Security Audit](https://github.com/julie-raymond-dev/E-Protocol/actions/workflows/security.yml/badge.svg)](https://github.com/julie-raymond-dev/E-Protocol/actions/workflows/security.yml)
-[![PR Validation](https://github.com/julie-raymond-dev/E-Protocol/actions/workflows/pr-validation.yml/badge.svg)](https://github.com/julie-raymond-dev/E-Protocol/actions/workflows/pr-validation.yml)
+[![CI/CD Pipeline](https://github.com/julie-raymond-dev/E-Protocol/actions/workflows/deploy.yml/badge.svg)](https://github.com/julie-raymond-dev/E-Protocol/actions/workflows/deploy.yml)
 [![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=flat&logo=github)](https://julie-raymond-dev.github.io/E-Protocol/)
 
 > Modern React TypeScript application for intelligent nutrition tracking and fitness management with offline-first architecture
@@ -138,7 +136,226 @@ npm audit
 - **Branch Protection** - Secure deployment workflow
 - **Secrets Management** - Environment variable protection
 
-## 💡 Core Features
+## � CI/CD Pipeline
+
+### Pipeline Overview
+Our CI/CD pipeline ensures code quality, security, and reliable deployments through a comprehensive 5-stage process:
+
+```mermaid
+graph TB
+    A[📥 Push/PR] --> B[🧪 Test & Validate]
+    B --> C[🔒 Security Audit]
+    B --> D[🚦 Performance Check]
+    C --> E[🚀 Deploy]
+    D --> E
+    E --> F[🎉 Live Application]
+    
+    style A fill:#e1f5fe
+    style B fill:#f3e5f5
+    style C fill:#ffebee
+    style D fill:#e8f5e8
+    style E fill:#fff3e0
+    style F fill:#e0f2f1
+```
+
+### Pipeline Stages
+
+#### 🧪 **Stage 1: Test & Validate**
+- **ESLint Analysis** - Code quality and style consistency
+- **TypeScript Compilation** - Type safety verification
+- **Build Testing** - Ensure production build succeeds
+- **Dependency Caching** - Optimized for faster subsequent runs
+
+```yaml
+# Triggers on every push and PR
+- Checkout code with full git history
+- Setup Node.js 18 with npm caching
+- Install dependencies with security audit
+- Run ESLint validation
+- Test production build process
+```
+
+#### 🔒 **Stage 2: Security Audit**
+- **Vulnerability Scanning** - npm audit for known security issues
+- **Dependency Analysis** - Check for outdated or unsafe packages
+- **Security Reporting** - Generate detailed security reports
+- **Artifact Storage** - Store security reports for 30 days
+
+```yaml
+# Runs after successful validation
+- Security audit with moderate severity threshold
+- Generate JSON security reports
+- Upload artifacts for review
+- Fail pipeline on high-severity issues
+```
+
+#### 🚦 **Stage 3: Performance Check** *(PR only)*
+- **Lighthouse CI** - Performance, accessibility, SEO analysis
+- **Bundle Size Analysis** - Monitor application size growth
+- **Performance Regression Detection** - Compare against baselines
+- **GitHub Comments** - Automatic performance reports on PRs
+
+```yaml
+# Only for Pull Requests
+- Build application for performance testing
+- Run Lighthouse CI with custom configuration
+- Generate performance metrics
+- Comment results on PR
+```
+
+#### 🚀 **Stage 4: Deploy** *(main branch only)*
+- **Production Build** - Optimized build with environment variables
+- **Asset Optimization** - Minification and compression
+- **Security Verification** - Final security checks
+- **GitHub Pages Deployment** - Automated deployment to production
+
+```yaml
+# Only for main branch pushes
+- Build with production environment variables
+- Verify build integrity and security
+- Deploy to GitHub Pages
+- Generate deployment summary
+```
+
+#### 🤖 **Stage 5: Auto-merge Dependabot** *(optional)*
+- **Automated Dependency Updates** - Safe merging of dependency PRs
+- **Security-First Approach** - Only merge after all checks pass
+- **Maintenance Automation** - Reduce manual maintenance overhead
+
+### Pipeline Configuration
+
+#### **Triggers**
+```yaml
+# Push to main branch
+on:
+  push:
+    branches: [ main ]
+    paths-ignore: ['**.md', '.gitignore', 'LICENSE']
+
+# Pull requests
+  pull_request:
+    branches: [ main ]
+    types: [opened, synchronize, reopened]
+```
+
+#### **Security & Permissions**
+```yaml
+permissions:
+  contents: read          # Read repository contents
+  pages: write           # Deploy to GitHub Pages
+  id-token: write        # OIDC token for secure deployment
+  pull-requests: write   # Comment on PRs
+  checks: write          # Update check status
+```
+
+#### **Environment Variables**
+- `VITE_AUTH0_DOMAIN` - Auth0 tenant domain (from GitHub Secrets)
+- `VITE_AUTH0_CLIENT_ID` - Auth0 application client ID (from GitHub Secrets)
+- `NODE_ENV` - Build environment (production)
+
+### Pipeline Benefits
+
+#### **🔍 Quality Assurance**
+- **Zero-defect deployments** - All code passes validation before deployment
+- **Consistent code style** - ESLint ensures team coding standards
+- **Type safety** - TypeScript prevents runtime errors
+- **Security-first** - Automated vulnerability detection
+
+#### **⚡ Performance Optimization**
+- **Dependency caching** - Faster build times through smart caching
+- **Parallel execution** - Security and performance checks run concurrently
+- **Optimized builds** - Minification and tree-shaking for smaller bundles
+- **CDN deployment** - GitHub Pages with global CDN distribution
+
+#### **🛡️ Security & Compliance**
+- **Secrets management** - Secure handling of sensitive configuration
+- **Audit trails** - Complete deployment history and artifact storage
+- **Dependency scanning** - Automated security vulnerability detection
+- **Branch protection** - Prevents direct pushes to main branch
+
+#### **📊 Monitoring & Reporting**
+- **Build status badges** - Real-time pipeline status visibility
+- **Performance metrics** - Lighthouse scores and bundle size tracking
+- **Security reports** - Detailed vulnerability assessments
+- **Deployment summaries** - Complete deployment information
+
+### Development Workflow
+
+#### **🔄 Standard Development Process**
+```bash
+# 1. Create feature branch
+git checkout -b feature/new-feature
+
+# 2. Develop and commit
+git add .
+git commit -m "feat: add new feature"
+
+# 3. Push and create PR
+git push origin feature/new-feature
+# Create PR via GitHub UI
+
+# 4. Automated checks run
+# - Test & Validate ✅
+# - Security Audit ✅  
+# - Performance Check ✅
+
+# 5. Review and merge
+# Manual review → Merge to main
+
+# 6. Automatic deployment
+# - Deploy stage runs
+# - Live on GitHub Pages
+```
+
+#### **🚨 Emergency Hotfixes**
+```bash
+# Quick fixes for critical issues
+git checkout -b hotfix/critical-fix
+# ... make changes ...
+git commit -m "fix: critical security patch"
+git push origin hotfix/critical-fix
+# Fast-track review and merge
+```
+
+### Pipeline Monitoring
+
+#### **📈 Key Metrics**
+- **Build Success Rate** - Track pipeline reliability
+- **Build Duration** - Monitor performance optimization
+- **Security Issues Found** - Track vulnerability trends
+- **Deployment Frequency** - Development velocity metrics
+
+#### **🔔 Notifications**
+- **Slack/Email Integration** - Pipeline status notifications
+- **GitHub Checks** - Status checks on PRs and commits
+- **Failed Build Alerts** - Immediate notification of failures
+
+#### **📋 Artifacts & Reports**
+- **Security Reports** - Stored for 30 days
+- **Performance Reports** - Lighthouse CI results
+- **Build Logs** - Complete pipeline execution logs
+- **Deployment Summaries** - Build size and deployment info
+
+### Troubleshooting
+
+#### **Common Issues**
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| Build Fails | TypeScript/ESLint errors | Fix code issues locally first |
+| Security Audit Fails | Vulnerable dependencies | Run `npm audit fix` |
+| Performance Regression | Bundle size increase | Analyze and optimize imports |
+| Deployment Fails | Missing secrets | Check GitHub repository secrets |
+
+#### **Debug Commands**
+```bash
+# Local pipeline simulation
+npm run lint              # ESLint validation
+npm run build            # Production build test
+npm audit                # Security audit
+npm audit fix            # Fix security issues
+```
+
+## �💡 Core Features
 
 ### Intelligent Nutrition Tracking
 - **Automated Meal Planning** - Date-based rotation algorithm
