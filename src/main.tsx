@@ -30,7 +30,7 @@ if (!domain || !clientId) {
         domain={domain}
         clientId={clientId}
         authorizationParams={{
-          redirect_uri: window.location.origin
+          redirect_uri: `${window.location.origin}${window.location.pathname}`
         }}
       >
         <App />
