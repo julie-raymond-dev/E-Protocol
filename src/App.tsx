@@ -8,78 +8,23 @@ import { RecipesProvider } from './contexts/RecipesContext';
 import { Loader } from 'lucide-react';
 
 /**
- * Hook for common dashboard logic
+ * Main application component that handles authentication and renders the appropriate UI
+ * @returns {JSX.Element} The main app component with authentication flow
  */
-function useDashboardLogic() {
+function App() {
+  const { isLoading, isAuthenticated } = useAuth0();
   const [userProfileOpen, setUserProfileOpen] = useState(false);
   const dashboardRef = useRef<DashboardRef>(null);
 
+  /**
+   * Handler called when the user profile changes (created, updated, or deleted)
+   */
   const handleProfileChange = () => {
+    // Refresh the Dashboard's profile data
     if (dashboardRef.current) {
       dashboardRef.current.refreshProfile();
     }
   };
-
-  const openProfile = () => setUserProfileOpen(true);
-  const closeProfile = () => setUserProfileOpen(false);
-
-  return {
-    userProfileOpen,
-    dashboardRef,
-    handleProfileChange,
-    openProfile,
-    closeProfile
-  };
-}
-
-/**
- * Main dashboard layout component
- */
-function DashboardLayout() {
-  const { userProfileOpen, dashboardRef, handleProfileChange, openProfile, closeProfile } = useDashboardLogic();
-
-  return (
-    <RecipesProvider>
-      <Navbar onOpenProfile={openProfile} />
-      <Dashboard 
-        ref={dashboardRef}
-        onOpenProfile={openProfile} 
-      />
-      <UserProfile 
-        isOpen={userProfileOpen} 
-        onClose={closeProfile}
-        onProfileChange={handleProfileChange}
-      />
-    </RecipesProvider>
-  );
-}
-
-/**
- * Component for demo mode (without Auth0)
- */
-function DemoApp() {
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Demo mode banner */}
-      <div className="bg-gradient-to-r from-emerald-500 to-blue-500 text-white p-3 text-center">
-        <div className="flex items-center justify-center gap-2">
-          <span className="text-lg">🚀</span>
-          <span className="font-semibold">Demo Mode - E-Protocol</span>
-        </div>
-        <p className="text-sm opacity-90 mt-1">
-          Full functionality available • All data is stored locally • No registration required
-        </p>
-      </div>
-      <DashboardLayout />
-    </div>
-  );
-}
-
-/**
- * Component for production mode (with Auth0)
- */
-function AuthenticatedApp() {
-  const { isLoading, isAuthenticated } = useAuth0();
 
   if (isLoading) {
     return (
@@ -95,22 +40,20 @@ function AuthenticatedApp() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <DashboardLayout />
+      <RecipesProvider>
+        <Navbar onOpenProfile={() => setUserProfileOpen(true)} />
+        <Dashboard 
+          ref={dashboardRef}
+          onOpenProfile={() => setUserProfileOpen(true)} 
+        />
+        <UserProfile 
+          isOpen={userProfileOpen} 
+          onClose={() => setUserProfileOpen(false)}
+          onProfileChange={handleProfileChange}
+        />
+      </RecipesProvider>
     </div>
   );
-}
-
-/**
- * Main application component that handles authentication and renders the appropriate UI
- * @returns {JSX.Element} The main app component with authentication flow
- */
-function App() {
-  // Détection du mode démo (quand Auth0 n'est pas configuré)
-  const isDemoMode = !import.meta.env.VITE_AUTH0_DOMAIN || 
-                     import.meta.env.VITE_AUTH0_DOMAIN === 'e-protocol-demo.eu.auth0.com';
-  
-  // Rendu conditionnel basé sur le mode
-  return isDemoMode ? <DemoApp /> : <AuthenticatedApp />;
 }
 
 export default App;
